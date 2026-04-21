@@ -1,0 +1,56 @@
+date,billed_cost_usd,billed_total_tokens,local_tokens_denver,denver_to_billed_ratio,local_tokens_utc,utc_to_billed_ratio,git_commit_activity,top_claude_projects_denver,notes
+2026-01-09,0.38,197532,197532,1.0,197532,1.0,bhr-ui-template:16; ai_services_poc_1:6,-Users-mmorrell:15; -Users-mmorrell-CascadeProjects-ai-services-poc-1:6; -Users-mmorrell-CascadeProjects-bhr-ui-template:3,
+2026-01-12,0.17,432414,432414,1.0,432414,1.0,bhr-ui-template:7; ai_services_poc_1:4,-Users-mmorrell:15,
+2026-01-14,0.17,599263,599263,1.0,599263,1.0,bhr-ui-template:20,-Users-mmorrell:25,
+2026-01-16,0.13,555551,555551,1.0,555551,1.0,,-Users-mmorrell:14,
+2026-01-20,0.06,178850,178850,1.0,178850,1.0,,-Users-mmorrell:6,
+2026-01-21,5.79,10471213,10471213,1.0,817914,0.08,bhr-ui-template:6,-Users-mmorrell:259; -Users-mmorrell-CascadeProjects-bhr-ui-template:9,
+2026-01-22,5.35,9663012,9663012,1.0,13640311,1.41,bhr-ui-template:17,-Users-mmorrell-CascadeProjects-bhr-ui-template:164; -Users-mmorrell-CascadeProjects-bhr-ui-template-inbox-build:117,BHR inbox build / People list + Figma refinement
+2026-01-23,0.27,1245058,1245058,1.0,6921058,5.56,bhr-ui-template:5,-Users-mmorrell-CascadeProjects-bhr-ui-template:30,
+2026-01-26,0.05,115515,115515,1.0,115515,1.0,bhr-ui-template:9,-Users-mmorrell:6,
+2026-01-27,0.22,153351,153351,1.0,82145,0.54,todo-app:1,-Users-mmorrell:4; -Users-mmorrell-CascadeProjects-bhr-ui-template:4,
+2026-01-28,1.86,6222774,6222774,1.0,3872548,0.62,bhr-ui-template:8,-Users-mmorrell:145,
+2026-01-29,0.35,1376551,1376551,1.0,3797983,2.76,,-Users-mmorrell:36,
+2026-01-30,5.9,11198277,11198277,1.0,10741688,0.96,bhr-ui-template:16,-Users-mmorrell:171; -Users-mmorrell-CascadeProjects-bhr-ui-template-job-desc:36,BHR job description prototype / AI autofill work
+2026-02-02,10.71,14470316,14470316,1.0,14470316,1.0,bhr-ui-template:14,-Users-mmorrell-CascadeProjects-bhr-ui-template-job-desc:162; -Users-mmorrell:84; -Users-mmorrell-CascadeProjects-bhr-ui-template:11,BHR job description + AI field fill + notifications
+2026-02-05,0.58,2817353,2817353,1.0,2817353,1.0,,-Users-mmorrell:63,
+2026-02-06,21.86,33478107,33478107,1.0,29801219,0.89,,-Users-mmorrell:377; -Users-mmorrell-CascadeProjects-bhr-ui-template:174,BHR heavy Claude work with large local/session volume
+2026-02-09,2.17,4656747,4656747,1.0,3627426,0.78,,-Users-mmorrell-CascadeProjects-bhr-ui-template:109,
+2026-02-10,0.68,1021628,1021628,1.0,2050949,2.01,,-Users-mmorrell-CascadeProjects-bhr-ui-template:15,
+2026-02-11,3.99,5422598,5422598,1.0,4903625,0.9,claude-skill-tree:4,-Users-mmorrell-CascadeProjects-bhr-ui-template:79; -Users-mmorrell:37,
+2026-02-12,1.03,332855,332855,1.0,851828,2.56,claude-skill-tree:1,-Users-mmorrell:1; -Users-mmorrell-CascadeProjects-bhr-ui-template:1,
+2026-02-17,1.87,956807,956807,1.0,619950,0.65,claude-skill-tree:6,-Users-mmorrell:12,
+2026-02-19,6.23,4749181,4749181,1.0,1856068,0.39,claude-skill-tree:9; ai_services_poc_1:7,-Users-mmorrell-CascadeProjects-ai-services-poc-1:122; -Users-mmorrell:6,
+2026-02-20,2.79,2131079,2131079,1.0,4619711,2.17,ai_services_poc_1:4,-Users-mmorrell-CascadeProjects-ai-services-poc-1:50; -Users-mmorrell-CascadeProjects-ai-services-poc-client-tabs:14,
+2026-02-23,1.56,966194,966194,1.0,966194,1.0,ai_services_poc_1:11,-Users-mmorrell:20; -Users-mmorrell-CascadeProjects-ai-services-poc-client-tabs:1; -Users-mmorrell-CascadeProjects-ai-services-poc-1:1,
+2026-02-24,1.28,1962081,1962081,1.0,1625776,0.83,ai_services_poc_1:18,-Users-mmorrell-CascadeProjects-ai-services-poc-client-tabs:24; -Users-mmorrell:2; -Users-mmorrell-CascadeProjects-ai-services-poc-1:1,AI services client tabs / unified nav exploration
+2026-02-25,4.61,6025110,6025110,1.0,3470324,0.58,ai_services_poc_1:13,-Users-mmorrell-CascadeProjects-ai-services-poc-client-tabs:155; -Users-mmorrell:1,AI services client home mockup burst
+2026-02-26,1.21,2049326,2049326,1.0,4940417,2.41,ai_services_poc_1:4,-Users-mmorrell-CascadeProjects-ai-services-poc-client-tabs:54,
+2026-02-27,1.76,3010670,3010670,1.0,43221,0.01,ai_services_poc_1:6,-Users-mmorrell-CascadeProjects-ai-services-poc-1:53; -Users-mmorrell-CascadeProjects-ai-services-poc-client-tabs:6,
+2026-03-02,0.23,566134,566134,1.0,566134,1.0,ai_services_poc_1:16,-Users-mmorrell-CascadeProjects-ai-services-poc-1:11,AI services approval + clarifying question UX
+2026-03-03,2.99,2908839,2908839,1.0,2908839,1.0,bhr-ui-template:11; ee-graph:8,-Users-mmorrell-CascadeProjects-ee-graph:25; -Users-mmorrell-CascadeProjects-bhr-ui-template:18; -Users-mmorrell:11,"Transition: ee-graph starts, bhr-ui-template Doom burst"
+2026-03-04,5.68,7037714,7037714,1.0,6474364,0.92,ee-graph:15; ai_services_poc_1:1,-Users-mmorrell-CascadeProjects-ee-graph:149,EE Graph dataset enrichment + viewer/filter work
+2026-03-05,3.29,3890434,3890434,1.0,4453784,1.14,,-Users-mmorrell-CascadeProjects-ai-services-poc-1:78,
+2026-03-06,44.45,48678174,48678174,1.0,48678174,1.0,ee-graph:1,-Users-mmorrell-CascadeProjects-ai-services-poc-1:345; -Users-mmorrell-CascadeProjects-ee-graph:307; -Users-mmorrell:22,EE Graph exploratory spike
+2026-03-09,25.84,33336561,33336561,1.0,33336561,1.0,,-Users-mmorrell-CascadeProjects-ai-services-poc-1:318; -Users-mmorrell-CascadeProjects-ee-graph:42; -Users-mmorrell:5,
+2026-03-10,7.1,9089561,9089561,1.0,9089561,1.0,,-Users-mmorrell-CascadeProjects-ai-services-poc-1:127; -Users-mmorrell:6,
+2026-03-11,15.24,19523535,19523535,1.0,19523535,1.0,,-Users-mmorrell-CascadeProjects-ee-graph:91; -Users-mmorrell-CascadeProjects-ai-services-poc-1:88; -Users-mmorrell:46,
+2026-03-12,103.41,156734492,156734492,1.0,95320940,0.61,ee-graph:11; jit-ui-canvas:11,-Users-mmorrell-CascadeProjects-ee-graph:1223; -Users-mmorrell-CascadeProjects-jit-ui-canvas:512; -Users-mmorrell:5,EE Graph + JIT/canvas acceleration
+2026-03-13,59.17,89897795,89897795,1.0,147971625,1.65,jit-ui-canvas:7; atomic-primitives:5; ee-graph:4,-Users-mmorrell-CascadeProjects-ee-graph:318; -Users-mmorrell-CascadeProjects-jit-ui-canvas:316; -Users-mmorrell-CascadeProjects-ee-graph-experiments-atomic-primitives:280; -Users-mmorrell-CascadeProjects-bhr-ui-template:45; -Users-mmorrell-CascadeProjects-ee-graph-experiments-jit-ui-canvas:45,
+2026-03-16,63.33,100448754,100448754,1.0,98051485,0.98,atomic-primitives:8; generative-visuals:7; ee-graph:4; ee-graph-studio:2; jit-ui-canvas:2,-Users-mmorrell-CascadeProjects-ee-graph-experiments-generative-visuals:286; -Users-mmorrell-CascadeProjects-ee-graph-experiments-jit-ui-canvas:228; -Users-mmorrell-CascadeProjects-ee-graph:107; -Users-mmorrell-CascadeProjects-ee-graph-experiments-atomic-primitives:105; -Users-mmorrell-CascadeProjects-bhr-ui-template:92,EE Graph Studio takes over
+2026-03-17,25.91,34790685,34790685,1.0,37187954,1.07,ee-graph-studio:9; ee-graph:3,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:199; -Users-mmorrell-CascadeProjects-ee-graph:67; -Users-mmorrell-CascadeProjects-bhr-ui-template:41; -Users-mmorrell-CascadeProjects-ee-graph-experiments-generative-visuals:26; -Users-mmorrell-CascadeProjects-ee-graph-experiments-atomic-primitives:2,
+2026-03-18,50.18,82717332,82717332,1.0,82717332,1.0,ee-graph-studio:8,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:470; -Users-mmorrell:3; -Users-mmorrell-CascadeProjects-ee-graph-experiments-generative-visuals:1,
+2026-03-19,24.11,42666729,42666729,1.0,42666729,1.0,ee-graph-studio:3,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:143; -Users-mmorrell-CascadeProjects-Mockup-Canvas:9,
+2026-03-20,193.96,356197406,356197406,1.0,340384621,0.96,ee-graph-studio:47; ideation-canvas:12,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:983; -Users-mmorrell-CascadeProjects-ideation-canvas:424; -Users-mmorrell-CascadeProjects-Mockup-Canvas:57; -Users-mmorrell-CascadeProjects-ai-services-poc-1:23,EE Graph Studio scenario/canvas/allocation mega day
+2026-03-23,84.13,155101818,155101818,1.0,155101818,1.0,ee-graph-studio:25,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:959; -Users-mmorrell-CascadeProjects-ee-graph-experiments:14; -Users-mmorrell-CascadeProjects-ee-graph:3,
+2026-03-24,8.91,10568191,10568191,1.0,10568191,1.0,ee-graph-studio:2,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:141; -Users-mmorrell-CascadeProjects-bhr-ui-template-experiments:12; -Users-mmorrell-CascadeProjects-ideation-canvas:8,
+2026-03-25,136.66,244735650,244735650,1.0,197402122,0.81,ee-graph-studio:62; ee-graph:1,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:1352; -Users-mmorrell-CascadeProjects-ee-graph-experiments:33,EE Graph Studio reskin + primitives + allocation polish
+2026-03-26,25.02,32822644,32822644,1.0,80156172,2.44,ee-graph-studio:12; ai_services_poc_1:2,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:86,
+2026-03-27,45.54,78296469,78296469,1.0,76184915,0.97,ee-graph-studio:35; ee-graph:3; ai_services_poc_1:2,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:584; -Users-mmorrell-CascadeProjects-bhr-ui-template-experiments:119; -Users-mmorrell-CascadeProjects-ee-graph-experiments:8,
+2026-03-30,6.94,10181564,10181564,1.0,10181564,1.0,ee-graph:2; ee-graph-studio:1,-Users-mmorrell-CascadeProjects-ee-graph-experiments:123; -Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:44; -Users-mmorrell-CascadeProjects-bhr-ui-template-experiments:8,
+2026-03-31,0.29,316075,316075,1.0,316075,1.0,,-Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:14,
+2026-04-01,1.32,1092661,1092661,1.0,1092661,1.0,bhr-ui-template:1,-Users-mmorrell-CascadeProjects-bhr-ui-template:13; -Users-mmorrell-CascadeProjects-ee-graph-experiments:9; -Users-mmorrell-CascadeProjects-bhr-ui-template-experiments:3; -Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:3,
+2026-04-02,44.26,68032110,68032110,1.0,61173901,0.9,ai_services_poc_1:5,-Users-mmorrell-CascadeProjects-ai-services-poc-1:631; -Users-mmorrell-CascadeProjects-ee-graph-experiments-ee-graph-studio:1,
+2026-04-03,62.31,98943912,98943912,1.0,64123200,0.65,ai_services_poc_1:5,-Users-mmorrell-CascadeProjects-ai-services-poc-1:550,
+2026-04-06,166.26,253710087,253710087,1.0,250877106,0.99,ai_services_poc_1:30,-Users-mmorrell-CascadeProjects-ai-services-poc-1:1214; -Users-mmorrell-CascadeProjects-ee-graph:2,Panda Command design system / visual overhaul mega day
+2026-04-07,2.08,3292795,3292795,1.0,6125776,1.86,,-Users-mmorrell-CascadeProjects-ai-services-poc-1:74,
