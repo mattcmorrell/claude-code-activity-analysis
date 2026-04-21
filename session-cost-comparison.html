@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session Cost Comparison — Claude Code Models</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0f1117;
+    --bg-card: #181a24;
+    --bg-card-border: #252836;
+    --text-primary: #e8eaed;
+    --text-secondary: #c8ccd4;
+    --text-dim: #9ea3b0;
+    --sonnet-color: #e8784e;
+    --opus46-color: #5b9cf5;
+    --opus47-color: #b07df0;
+    --divider: #2a2d3a;
+    --stat-positive: #4ecb8d;
+    --stat-negative: #e8784e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+  }
+
+  .container { max-width: 1120px; margin: 0 auto; }
+
+  header { margin-bottom: 40px; }
+
+  header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+
+  header p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    max-width: 740px;
+  }
+
+  /* ── Slider control ── */
+  .control-bar {
+    margin-bottom: 36px;
+    padding: 24px 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 12px;
+  }
+
+  .control-bar h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .control-bar .control-description {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+  }
+
+  .slider-row input[type="range"] {
+    flex: 1;
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--divider);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+  }
+
+  .slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--sonnet-color);
+    border: 3px solid var(--bg-card);
+    box-shadow: 0 0 0 1px rgba(232, 120, 78, 0.4);
+    cursor: pointer;
+  }
+
+  .slider-labels {
+    position: relative;
+    height: 20px;
+    margin-top: 8px;
+  }
+
+  .slider-labels span {
+    position: absolute;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .slider-labels span:first-child { left: 0; transform: none; }
+  .slider-labels span:last-child { left: 100%; transform: translateX(-100%); }
+  .slider-labels span:nth-child(2) { left: 25%; }
+  .slider-labels span:nth-child(3) { left: 50%; }
+  .slider-labels span:nth-child(4) { left: 75%; }
+
+  .slider-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--sonnet-color);
+    min-width: 60px;
+    text-align: right;
+  }
+
+  .slider-detail {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* ── Assumptions ── */
+  .assumptions-bar {
+    margin-bottom: 36px;
+    padding: 18px 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 10px;
+  }
+
+  .assumptions-bar h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+
+  .assumptions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 40px;
+  }
+
+  .assumption-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .assumption-item .label {
+    color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .assumption-item.key-assumption {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .assumption-item.key-assumption .label {
+    color: var(--text-primary);
+  }
+
+  /* ── Charts ── */
+  .chart-section { margin-bottom: 56px; }
+
+  .chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 12px;
+    padding: 32px 28px 24px;
+  }
+
+  .chart-card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+  }
+
+  .chart-card .subtitle {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+
+  .chart-wrap { position: relative; height: 380px; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--divider);
+  }
+
+  .stat-card {
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--bg-card-border);
+  }
+
+  .stat-card .model-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+
+  .stat-card .model-label.sonnet { color: var(--sonnet-color); }
+  .stat-card .model-label.opus46 { color: var(--opus46-color); }
+  .stat-card .model-label.opus47 { color: var(--opus47-color); }
+
+  .stat-card .cost-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .stat-card .cost-detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .stat-card .cost-detail .highlight-bad { color: var(--stat-negative); font-weight: 600; }
+  .stat-card .cost-detail .highlight-good { color: var(--stat-positive); font-weight: 600; }
+
+  .comparison-callout {
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: rgba(78, 203, 141, 0.06);
+    border: 1px solid rgba(78, 203, 141, 0.18);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .comparison-callout strong { color: var(--stat-positive); }
+
+  @media (max-width: 700px) {
+    body { padding: 24px 14px 40px; }
+    .assumptions-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr; }
+    .chart-wrap { height: 300px; }
+    header h1 { font-size: 22px; }
+    .slider-row { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Session Cost: Sonnet 4.6 vs Opus 4.6 vs Opus 4.7</h1>
+    <p>Cumulative API cost for a short design debugging session — 3 visual "fix this" tasks completed sequentially. How much more does it cost when the cheaper model needs multiple attempts?</p>
+  </header>
+
+  <!-- Slider -->
+  <div class="control-bar">
+    <h3>Key Assumption: Sonnet Efficiency</h3>
+    <p class="control-description">Opus one-shots each task in 5 turns. How many turns does Sonnet need for the same task? At 1× Sonnet matches Opus. At 3× (the default), Sonnet needs 15 turns — 5 productive + 10 fixing breakage.</p>
+    <div style="display:flex; align-items:baseline; gap:16px; margin-bottom:12px;">
+      <div class="slider-value" id="sliderValue">3.0×</div>
+      <div class="slider-detail" id="sliderDetail">15 turns/task · 45 total</div>
+    </div>
+    <div class="slider-row">
+      <div style="flex:1; min-width:0;">
+        <input type="range" id="sonnetMultiplier" min="1" max="5" step="0.5" value="3">
+        <div class="slider-labels">
+          <span>1× (same as Opus)</span>
+          <span>2×</span>
+          <span>3× (default)</span>
+          <span>4×</span>
+          <span>5×</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assumptions -->
+  <div class="assumptions-bar">
+    <h3>Fixed Assumptions</h3>
+    <div class="assumptions-grid">
+      <div class="assumption-item key-assumption"><span class="label">Opus turns/task:</span> 5 (one-shots the fix)</div>
+      <div class="assumption-item key-assumption"><span class="label">Tasks in session:</span> 3</div>
+      <div class="assumption-item"><span class="label">Base context:</span> 25K tokens (system prompt, tools, CLAUDE.md)</div>
+      <div class="assumption-item"><span class="label">Per turn (text):</span> +5K tokens (productive) / +6K (fix-up)</div>
+      <div class="assumption-item"><span class="label">Screenshot mode:</span> 1 screenshot per turn (~2,560 tokens, 4K crop)</div>
+      <div class="assumption-item"><span class="label">Screenshots:</span> permanent, incompressible (can't be compacted)</div>
+      <div class="assumption-item"><span class="label">Opus 4.7 tokenizer:</span> +30% token inflation on text (not images)</div>
+      <div class="assumption-item"><span class="label">Cache read rates:</span> Sonnet $0.30 / Opus $0.50 per MTok</div>
+    </div>
+  </div>
+
+  <!-- Chart 1: Text Only -->
+  <div class="chart-section">
+    <div class="chart-card">
+      <h2>Text Only — No Screenshots</h2>
+      <p class="subtitle">Pure code debugging. Model reads code and makes fixes without seeing rendered output.</p>
+      <div class="chart-wrap">
+        <canvas id="chartTextOnly"></canvas>
+      </div>
+      <div class="stats-row" id="statsTextOnly"></div>
+      <div class="comparison-callout" id="calloutTextOnly"></div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Text + Screenshots -->
+  <div class="chart-section">
+    <div class="chart-card">
+      <h2>Text + Screenshots (4K Display)</h2>
+      <p class="subtitle">Visual debugging — every turn includes a screenshot. Each image is ~2,560 tokens of permanent, incompressible context.</p>
+      <div class="chart-wrap">
+        <canvas id="chartScreenshots"></canvas>
+      </div>
+      <div class="stats-row" id="statsScreenshots"></div>
+      <div class="comparison-callout" id="calloutScreenshots"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Constants ──
+const TASKS = 3;
+const OPUS_TURNS_PER_TASK = 5;
+const BASE_CONTEXT = 25000;
+const PRODUCTIVE_TURN_GROWTH = 5000;
+const FIXUP_TURN_GROWTH = 6000;
+const SCREENSHOT_TOKENS = 2560;
+
+const MODEL_CONFIG = {
+  opus46: {
+    label: 'Opus 4.6',
+    cacheReadRate: 0.50 / 1e6,
+    outputRate: 25 / 1e6,
+    outputTokens: 2000,
+    tokenizerMult: 1.0,
+    color: '#5b9cf5',
+    borderDash: [],
+  },
+  opus47: {
+    label: 'Opus 4.7',
+    cacheReadRate: 0.50 / 1e6,
+    outputRate: 25 / 1e6,
+    outputTokens: 2000,
+    tokenizerMult: 1.3,
+    color: '#b07df0',
+    borderDash: [6, 3],
+  },
+  sonnet: {
+    label: 'Sonnet 4.6',
+    cacheReadRate: 0.30 / 1e6,
+    outputRate: 15 / 1e6,
+    outputTokens: 2000,
+    tokenizerMult: 1.0,
+    color: '#e8784e',
+    borderDash: [],
+  },
+};
+
+// ── Simulation ──
+function simulate(modelKey, sonnetMult, includeScreenshots) {
+  const m = MODEL_CONFIG[modelKey];
+  const isOneshotModel = modelKey !== 'sonnet';
+  const turnsPerTask = isOneshotModel ? OPUS_TURNS_PER_TASK : Math.round(OPUS_TURNS_PER_TASK * sonnetMult);
+  const productiveTurns = OPUS_TURNS_PER_TASK;
+
+  const points = [{ turn: 0, cost: 0, context: BASE_CONTEXT * m.tokenizerMult }];
+  let context = BASE_CONTEXT * m.tokenizerMult;
+  let cumCost = 0;
+  let turnIndex = 0;
+
+  for (let task = 0; task < TASKS; task++) {
+    for (let t = 0; t < turnsPerTask; t++) {
+      turnIndex++;
+      const isFixup = t >= productiveTurns;
+
+      // Every turn gets a screenshot in screenshot mode
+      const screenshotThisTurn = includeScreenshots ? 1 : 0;
+
+      // Context growth: text + screenshot
+      // Screenshots are tokenized by pixel count, not text tokenizer — no tokenizerMult on images
+      const textGrowth = (isFixup ? FIXUP_TURN_GROWTH : PRODUCTIVE_TURN_GROWTH) * m.tokenizerMult;
+      const imageGrowth = screenshotThisTurn * SCREENSHOT_TOKENS;
+      context += textGrowth + imageGrowth;
+
+      // Cost: cache reads on full context + output
+      const turnCost = (context * m.cacheReadRate) + (m.outputTokens * m.tokenizerMult * m.outputRate);
+      cumCost += turnCost;
+
+      points.push({ turn: turnIndex, cost: cumCost, context });
+    }
+  }
+
+  return { points, finalCost: cumCost, finalTurn: turnIndex, turnsPerTask };
+}
+
+function formatDollars(v) { return '$' + v.toFixed(2); }
+
+// ── Chart management ──
+let chartInstances = {};
+
+function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult) {
+  // Destroy existing chart
+  if (chartInstances[canvasId]) {
+    chartInstances[canvasId].destroy();
+  }
+
+  const results = {};
+  for (const key of Object.keys(MODEL_CONFIG)) {
+    results[key] = simulate(key, sonnetMult, includeScreenshots);
+  }
+
+  const opusDoneTurn = OPUS_TURNS_PER_TASK * TASKS;
+  const sonnetDoneTurn = results.sonnet.finalTurn;
+  const maxTurn = Math.max(sonnetDoneTurn, opusDoneTurn) + 2;
+
+  // Build datasets — main lines
+  const datasets = Object.entries(MODEL_CONFIG).map(([key, m]) => ({
+    label: m.label,
+    data: results[key].points.map(p => ({ x: p.turn, y: p.cost })),
+    borderColor: m.color,
+    backgroundColor: m.color + '18',
+    borderWidth: 2.5,
+    borderDash: m.borderDash,
+    pointRadius: 0,
+    pointHoverRadius: 5,
+    pointHoverBackgroundColor: m.color,
+    pointHoverBorderColor: '#fff',
+    pointHoverBorderWidth: 2,
+    tension: 0.2,
+    fill: false,
+  }));
+
+  // Endpoint dots
+  Object.entries(MODEL_CONFIG).forEach(([key, m]) => {
+    const pts = results[key].points;
+    const last = pts[pts.length - 1];
+    datasets.push({
+      label: m.label + ' (done)',
+      data: [{ x: last.turn, y: last.cost }],
+      borderColor: m.color,
+      backgroundColor: m.color,
+      pointRadius: 7,
+      pointBorderColor: '#181a24',
+      pointBorderWidth: 2.5,
+      showLine: false,
+    });
+  });
+
+  const maxY = results.sonnet.finalCost * 1.18;
+
+  const annotations = {
+    opusDoneLine: {
+      type: 'line',
+      xMin: opusDoneTurn,
+      xMax: opusDoneTurn,
+      borderColor: 'rgba(255, 255, 255, 0.18)',
+      borderWidth: 1.5,
+      borderDash: [4, 4],
+      label: {
+        display: true,
+        content: `Opus done — 3 tasks in ${opusDoneTurn} turns`,
+        position: 'start',
+        backgroundColor: 'rgba(24, 26, 36, 0.95)',
+        color: '#c8ccd4',
+        font: { family: 'DM Sans', size: 12, weight: 500 },
+        padding: { x: 8, y: 5 },
+        borderRadius: 4,
+      },
+    },
+  };
+
+  // Only show Sonnet done line if it's different from Opus
+  if (sonnetMult > 1) {
+    annotations.sonnetDoneLine = {
+      type: 'line',
+      xMin: sonnetDoneTurn,
+      xMax: sonnetDoneTurn,
+      borderColor: 'rgba(232, 120, 78, 0.3)',
+      borderWidth: 1.5,
+      borderDash: [4, 4],
+      label: {
+        display: true,
+        content: `Sonnet done — 3 tasks in ${sonnetDoneTurn} turns`,
+        position: 'start',
+        backgroundColor: 'rgba(24, 26, 36, 0.95)',
+        color: '#c8ccd4',
+        font: { family: 'DM Sans', size: 12, weight: 500 },
+        padding: { x: 8, y: 5 },
+        borderRadius: 4,
+        yAdjust: 24,
+      },
+    };
+  }
+
+  const chart = new Chart(document.getElementById(canvasId), {
+    type: 'line',
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 400 },
+      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      scales: {
+        x: {
+          type: 'linear',
+          min: 0,
+          max: maxTurn,
+          title: {
+            display: true,
+            text: 'Turn',
+            color: '#9ea3b0',
+            font: { family: 'DM Sans', size: 13, weight: 500 },
+            padding: { top: 8 },
+          },
+          ticks: {
+            color: '#9ea3b0',
+            font: { family: 'JetBrains Mono', size: 11 },
+            stepSize: 5,
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { color: 'rgba(255,255,255,0.08)' },
+        },
+        y: {
+          min: 0,
+          max: maxY,
+          title: {
+            display: true,
+            text: 'Cumulative Cost ($)',
+            color: '#9ea3b0',
+            font: { family: 'DM Sans', size: 13, weight: 500 },
+            padding: { bottom: 8 },
+          },
+          ticks: {
+            color: '#9ea3b0',
+            font: { family: 'JetBrains Mono', size: 11 },
+            callback: v => '$' + v.toFixed(2),
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { color: 'rgba(255,255,255,0.08)' },
+        },
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'start',
+          labels: {
+            color: '#c8ccd4',
+            font: { family: 'DM Sans', size: 13, weight: 500 },
+            usePointStyle: true,
+            pointStyle: 'line',
+            padding: 20,
+            boxWidth: 28,
+            filter: item => !item.text.includes('(done)'),
+          },
+        },
+        tooltip: {
+          backgroundColor: '#252836',
+          titleColor: '#e8eaed',
+          bodyColor: '#c8ccd4',
+          borderColor: '#3a3d4e',
+          borderWidth: 1,
+          cornerRadius: 6,
+          padding: 12,
+          titleFont: { family: 'DM Sans', size: 13, weight: 600 },
+          bodyFont: { family: 'JetBrains Mono', size: 12 },
+          callbacks: {
+            title: items => 'Turn ' + Math.round(items[0].parsed.x),
+            label: item => {
+              if (item.dataset.label.includes('(done)')) return null;
+              return ' ' + item.dataset.label + ': ' + formatDollars(item.parsed.y);
+            },
+          },
+          filter: item => !item.dataset.label.includes('(done)'),
+        },
+        annotation: { annotations },
+      },
+    },
+  });
+
+  chartInstances[canvasId] = chart;
+
+  // ── Stats ──
+  const s = results.sonnet.finalCost;
+  const o46 = results.opus46.finalCost;
+  const o47 = results.opus47.finalCost;
+  const pctVs46 = ((s / o46 - 1) * 100).toFixed(0);
+  const pctVs47 = ((s / o47 - 1) * 100).toFixed(0);
+  const sonnetTurns = results.sonnet.finalTurn;
+  const multLabel = sonnetMult.toFixed(1).replace('.0', '');
+
+  document.getElementById(statsId).innerHTML = `
+    <div class="stat-card">
+      <div class="model-label opus46">Opus 4.6</div>
+      <div class="cost-value">${formatDollars(o46)}</div>
+      <div class="cost-detail">${opusDoneTurn} turns · <span class="highlight-good">cheapest</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="model-label opus47">Opus 4.7</div>
+      <div class="cost-value">${formatDollars(o47)}</div>
+      <div class="cost-detail">${opusDoneTurn} turns · +30% tokenizer tax</div>
+    </div>
+    <div class="stat-card">
+      <div class="model-label sonnet">Sonnet 4.6</div>
+      <div class="cost-value">${formatDollars(s)}</div>
+      <div class="cost-detail">${sonnetTurns} turns · <span class="highlight-bad">${multLabel}× more turns</span></div>
+    </div>
+  `;
+
+  const calloutEl = document.getElementById(calloutId);
+  if (sonnetMult <= 1) {
+    calloutEl.innerHTML = `At equal efficiency (1×), Sonnet is the cheapest option — <strong>its per-token price advantage is real when it doesn't need extra turns.</strong>`;
+  } else {
+    calloutEl.innerHTML = `
+      At ${multLabel}× turns, <strong>Sonnet costs ${pctVs46}% more than Opus 4.6</strong> and <strong>${pctVs47}% more than Opus 4.7</strong> for the same 3 tasks — despite being the cheapest model per token. Opus finishes in ${opusDoneTurn} turns while Sonnet needs ${sonnetTurns}.
+    `;
+  }
+}
+
+// ── Slider ──
+function updateAll() {
+  const mult = parseFloat(document.getElementById('sonnetMultiplier').value);
+  const sonnetTurnsPerTask = Math.round(OPUS_TURNS_PER_TASK * mult);
+  const totalSonnet = sonnetTurnsPerTask * TASKS;
+
+  document.getElementById('sliderValue').textContent = mult.toFixed(1) + '×';
+  document.getElementById('sliderDetail').textContent = `${sonnetTurnsPerTask} turns/task · ${totalSonnet} total`;
+
+  buildChart('chartTextOnly', false, 'statsTextOnly', 'calloutTextOnly', mult);
+  buildChart('chartScreenshots', true, 'statsScreenshots', 'calloutScreenshots', mult);
+}
+
+document.getElementById('sonnetMultiplier').addEventListener('input', updateAll);
+
+// Initial render
+updateAll();
+</script>
+
+</body>
+</html>
