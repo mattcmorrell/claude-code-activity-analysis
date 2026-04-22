@@ -791,7 +791,56 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .slide-nuke.step-2 .nuke-bottom { animation: fadeUp 0.5s ease 2s forwards; }
 
 /* ============================================ */
-/* SLIDE 14: LONG-TERM MEMORY — 2 steps          */
+/* SLIDE 11: CHECKPOINT — 3 steps                */
+/* ============================================ */
+
+.checkpoint-scene { display: flex; flex-direction: column; align-items: center; gap: 32px; max-width: 800px; width: 100%; }
+
+.checkpoint-problem { display: flex; gap: 48px; align-items: center; justify-content: center; width: 100%; opacity: 0; }
+.cp-before, .cp-after { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cp-label { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+.cp-window { width: 220px; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 4px; min-height: 140px; }
+.cp-window-full { background: rgba(91,156,245,0.08); border: 2px solid rgba(91,156,245,0.25); }
+.cp-window-empty { background: rgba(239,68,68,0.06); border: 2px dashed rgba(239,68,68,0.25); justify-content: center; align-items: center; }
+.cp-bar { height: 10px; border-radius: 3px; background: rgba(91,156,245,0.25); }
+.cp-bar:nth-child(odd) { width: 90%; }
+.cp-bar:nth-child(even) { width: 70%; }
+.cp-empty-text { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: rgba(239,68,68,0.6); }
+.cp-arrow { font-size: 32px; color: var(--text-dim); }
+.cp-clear-tag { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--red); background: rgba(239,68,68,0.08); padding: 4px 12px; border-radius: 6px; margin-top: 4px; }
+
+.checkpoint-solution { opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+.cp-flow { display: flex; align-items: center; gap: 20px; justify-content: center; }
+.cp-step-card { border-radius: 12px; padding: 20px 24px; text-align: center; display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+.cp-step-cmd { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; }
+.cp-step-desc { font-size: 14px; line-height: 1.4; }
+.cp-step-checkpoint { background: rgba(34,197,94,0.10); border: 2px solid rgba(34,197,94,0.3); }
+.cp-step-checkpoint .cp-step-cmd { color: var(--green); }
+.cp-step-checkpoint .cp-step-desc { color: rgba(34,197,94,0.8); }
+.cp-step-clear { background: rgba(34,197,94,0.08); border: 2px solid rgba(34,197,94,0.25); }
+.cp-step-clear .cp-step-cmd { color: var(--green); }
+.cp-step-clear .cp-step-desc { color: rgba(34,197,94,0.75); }
+.cp-flow-arrow { font-size: 24px; color: var(--text-dim); }
+.cp-saves-to { font-size: 14px; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+.cp-saves-to code { font-family: 'JetBrains Mono', monospace; color: var(--green); background: rgba(34,197,94,0.08); padding: 2px 8px; border-radius: 4px; font-size: 13px; }
+
+.checkpoint-payoff { opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.cp-new-session { display: flex; align-items: center; gap: 16px; background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2); border-radius: 12px; padding: 20px 32px; }
+.cp-ns-icon { font-size: 28px; }
+.cp-ns-text { font-size: 16px; color: var(--text-secondary); }
+.cp-ns-text strong { color: var(--green); font-weight: 600; }
+.cp-habit { font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--text-dim); letter-spacing: 0.02em; }
+.cp-habit span { color: var(--green); }
+
+/* Step 1: problem */
+.slide-checkpoint.step-1 .checkpoint-problem { animation: fadeUp 0.5s ease forwards; }
+/* Step 2: solution flow */
+.slide-checkpoint.step-2 .checkpoint-solution { animation: fadeUp 0.5s ease forwards; }
+/* Step 3: payoff */
+.slide-checkpoint.step-3 .checkpoint-payoff { animation: fadeUp 0.5s ease forwards; }
+
+/* ============================================ */
+/* SLIDE 15: LONG-TERM MEMORY — 2 steps          */
 /* ============================================ */
 
 .memory-files { display: flex; gap: 24px; max-width: 900px; width: 100%; justify-content: center; margin-bottom: 40px; }
@@ -834,6 +883,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .slide-closing.step-2 .closing-pill:nth-child(3) { animation: fadeUp 0.4s ease 0.2s forwards; }
 .slide-closing.step-2 .closing-pill:nth-child(4) { animation: fadeUp 0.4s ease 0.3s forwards; }
 .slide-closing.step-2 .closing-pill:nth-child(5) { animation: fadeUp 0.4s ease 0.4s forwards; }
+.slide-closing.step-2 .closing-pill:nth-child(6) { animation: fadeUp 0.4s ease 0.5s forwards; }
 </style>
 </head>
 <body>
@@ -1155,8 +1205,59 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     </div>
   </div>
 
-  <!-- SLIDE 11: OPUS VS SONNET -->
-  <div class="slide slide-opus-sonnet" data-slide="11" data-steps="4">
+  <!-- SLIDE 11: CHECKPOINT SKILL -->
+  <div class="slide slide-checkpoint" data-slide="11" data-steps="3">
+    <h2 style="margin-bottom: 24px;"><span class="mono" style="color: var(--green);">/checkpoint</span> &mdash; Save Before You Clear</h2>
+    <div class="checkpoint-scene">
+      <div class="checkpoint-problem">
+        <div class="cp-before">
+          <div class="cp-label">Before /clear</div>
+          <div class="cp-window cp-window-full">
+            <div class="cp-bar"></div><div class="cp-bar"></div><div class="cp-bar"></div>
+            <div class="cp-bar"></div><div class="cp-bar"></div><div class="cp-bar"></div>
+          </div>
+          <div style="font-size: 13px; color: var(--text-dim);">Decisions, gotchas, context</div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+          <div class="cp-arrow">&rarr;</div>
+          <div class="cp-clear-tag">/clear</div>
+        </div>
+        <div class="cp-after">
+          <div class="cp-label">After /clear</div>
+          <div class="cp-window cp-window-empty">
+            <div class="cp-empty-text">gone</div>
+          </div>
+          <div style="font-size: 13px; color: rgba(239,68,68,0.7);">Everything. Lost.</div>
+        </div>
+      </div>
+
+      <div class="checkpoint-solution">
+        <div class="cp-flow">
+          <div class="cp-step-card cp-step-checkpoint">
+            <div class="cp-step-cmd">/checkpoint</div>
+            <div class="cp-step-desc">Saves what matters:<br>decisions, state, gotchas</div>
+          </div>
+          <div class="cp-flow-arrow">&rarr;</div>
+          <div class="cp-step-card cp-step-clear">
+            <div class="cp-step-cmd">/clear &#10003;</div>
+            <div class="cp-step-desc">Safe to clear &mdash;<br>nothing lost</div>
+          </div>
+        </div>
+        <div class="cp-saves-to">Writes to <code>memory/checkpoint.md</code> + <code>.claude/checkpoint.md</code></div>
+      </div>
+
+      <div class="checkpoint-payoff">
+        <div class="cp-new-session">
+          <div class="cp-ns-icon">&#9889;</div>
+          <div class="cp-ns-text">New session <strong>auto-loads</strong> the checkpoint &mdash; fresh context, full memory</div>
+        </div>
+        <div class="cp-habit">The habit: <span>/checkpoint</span> &rarr; <span>/clear</span> &rarr; keep going</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: OPUS VS SONNET -->
+  <div class="slide slide-opus-sonnet" data-slide="12" data-steps="4">
     <h2>Opus vs Sonnet</h2>
     <div class="price-callout">
       <div class="price-callout-number">1.67&times;</div>
@@ -1187,16 +1288,16 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="compare-transition">Let's see this live...</div>
   </div>
 
-  <!-- SLIDE 12: LIVE IFRAME -->
-  <div class="slide slide-iframe" data-slide="12" data-steps="0">
+  <!-- SLIDE 13: LIVE IFRAME -->
+  <div class="slide slide-iframe" data-slide="13" data-steps="0">
     <div class="iframe-container">
       <iframe src="session-cost-comparison.html" loading="lazy"></iframe>
     </div>
     <div class="iframe-hint">Drag sliders to explore</div>
   </div>
 
-  <!-- SLIDE 13: LONG-TERM MEMORY -->
-  <div class="slide slide-memory" data-slide="13" data-steps="2">
+  <!-- SLIDE 14: LONG-TERM MEMORY -->
+  <div class="slide slide-memory" data-slide="14" data-steps="2">
     <h2>Long-Term Memory</h2>
     <div class="memory-files">
       <div class="memory-file">
@@ -1218,8 +1319,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="memory-tagline">Traction that survives <code>/clear</code></div>
   </div>
 
-  <!-- SLIDE 14: CLOSING -->
-  <div class="slide slide-closing" data-slide="14" data-steps="2">
+  <!-- SLIDE 15: CLOSING -->
+  <div class="slide slide-closing" data-slide="15" data-steps="2">
     <div class="closing-glow"></div>
     <h1>
       <span>Think bigger.</span>
@@ -1229,6 +1330,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="closing-recap">
       <span class="closing-pill">Session length = cost</span>
       <span class="closing-pill">Keep sessions warm</span>
+      <span class="closing-pill">/checkpoint before /clear</span>
       <span class="closing-pill">One deep, rest shallow</span>
       <span class="closing-pill">Opus over Sonnet</span>
       <span class="closing-pill">Memory files = traction</span>
