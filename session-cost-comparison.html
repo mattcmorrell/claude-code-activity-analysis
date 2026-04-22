@@ -70,8 +70,8 @@
   }
 
   .control-bar .control-description {
-    font-size: 13px;
-    color: var(--text-dim);
+    font-size: 16px;
+    color: var(--text-secondary);
     margin-bottom: 18px;
     line-height: 1.5;
   }
@@ -286,26 +286,47 @@
 <div class="container">
   <header>
     <h1>Session Cost: Sonnet 4.6 vs Opus 4.6 vs Opus 4.7</h1>
-    <p>Cumulative API cost for a short design debugging session — 3 visual "fix this" tasks completed sequentially. How much more does it cost when the cheaper model needs multiple attempts?</p>
+    <p>One task, one session, then clear context. How much does it actually cost when Sonnet needs multiple attempts to do what Opus gets right the first time?</p>
   </header>
 
-  <!-- Slider -->
+  <!-- Sliders -->
   <div class="control-bar">
-    <h3>Key Assumption: Sonnet Efficiency</h3>
-    <p class="control-description">Opus one-shots each task in 5 turns. How many turns does Sonnet need for the same task? At 1× Sonnet matches Opus. At 3× (the default), Sonnet needs 15 turns — 5 productive + 10 fixing breakage.</p>
-    <div style="display:flex; align-items:baseline; gap:16px; margin-bottom:12px;">
+    <h3>How Much Does Sonnet Struggle?</h3>
+    <p class="control-description">Opus gets it right. Sonnet breaks things and burns turns cleaning up. How many more?</p>
+
+    <div style="display:flex; align-items:baseline; gap:16px; margin-bottom:12px; margin-top:20px;">
       <div class="slider-value" id="sliderValue">3.0×</div>
-      <div class="slider-detail" id="sliderDetail">15 turns/task · 45 total</div>
+      <div class="slider-detail" id="sliderDetail">Sonnet: 12 turns · Opus: 4 turns</div>
     </div>
     <div class="slider-row">
       <div style="flex:1; min-width:0;">
         <input type="range" id="sonnetMultiplier" min="1" max="5" step="0.5" value="3">
         <div class="slider-labels">
-          <span>1× (same as Opus)</span>
+          <span>1× (best case)</span>
           <span>2×</span>
-          <span>3× (default)</span>
+          <span>3× (observed)</span>
           <span>4×</span>
           <span>5×</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px;">How Big Is the Task?</h3>
+    <p class="control-description">How many turns does Opus need? Small fix = 4 turns. Bigger feature = more.</p>
+
+    <div style="display:flex; align-items:baseline; gap:16px; margin-bottom:12px; margin-top:20px;">
+      <div class="slider-value" id="taskSizeValue">4</div>
+      <div class="slider-detail" id="taskSizeDetail">Opus turns</div>
+    </div>
+    <div class="slider-row">
+      <div style="flex:1; min-width:0;">
+        <input type="range" id="taskSize" min="4" max="20" step="2" value="4">
+        <div class="slider-labels">
+          <span>4 (quick fix)</span>
+          <span>8</span>
+          <span>12</span>
+          <span>16</span>
+          <span>20 (feature)</span>
         </div>
       </div>
     </div>
@@ -315,8 +336,7 @@
   <div class="assumptions-bar">
     <h3>Fixed Assumptions</h3>
     <div class="assumptions-grid">
-      <div class="assumption-item key-assumption"><span class="label">Opus turns/task:</span> 5 (one-shots the fix)</div>
-      <div class="assumption-item key-assumption"><span class="label">Tasks in session:</span> 3</div>
+      <div class="assumption-item key-assumption"><span class="label">Tasks in session:</span> 1 (clear context between tasks)</div>
       <div class="assumption-item"><span class="label">Base context:</span> 25K tokens (system prompt, tools, CLAUDE.md)</div>
       <div class="assumption-item"><span class="label">Per turn (text):</span> +5K tokens (productive) / +6K (fix-up)</div>
       <div class="assumption-item"><span class="label">Screenshot mode:</span> 1 screenshot per turn (~2,560 tokens, 4K crop)</div>
@@ -355,8 +375,7 @@
 
 <script>
 // ── Constants ──
-const TASKS = 3;
-const OPUS_TURNS_PER_TASK = 5;
+const TASKS = 1;
 const BASE_CONTEXT = 25000;
 const PRODUCTIVE_TURN_GROWTH = 5000;
 const FIXUP_TURN_GROWTH = 6000;
@@ -393,11 +412,11 @@ const MODEL_CONFIG = {
 };
 
 // ── Simulation ──
-function simulate(modelKey, sonnetMult, includeScreenshots) {
+function simulate(modelKey, sonnetMult, includeScreenshots, opusTurns) {
   const m = MODEL_CONFIG[modelKey];
   const isOneshotModel = modelKey !== 'sonnet';
-  const turnsPerTask = isOneshotModel ? OPUS_TURNS_PER_TASK : Math.round(OPUS_TURNS_PER_TASK * sonnetMult);
-  const productiveTurns = OPUS_TURNS_PER_TASK;
+  const turnsPerTask = isOneshotModel ? opusTurns : Math.round(opusTurns * sonnetMult);
+  const productiveTurns = opusTurns;
 
   const points = [{ turn: 0, cost: 0, context: BASE_CONTEXT * m.tokenizerMult }];
   let context = BASE_CONTEXT * m.tokenizerMult;
@@ -434,7 +453,7 @@ function formatDollars(v) { return '$' + v.toFixed(2); }
 // ── Chart management ──
 let chartInstances = {};
 
-function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult) {
+function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult, opusTurns) {
   // Destroy existing chart
   if (chartInstances[canvasId]) {
     chartInstances[canvasId].destroy();
@@ -442,10 +461,10 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
 
   const results = {};
   for (const key of Object.keys(MODEL_CONFIG)) {
-    results[key] = simulate(key, sonnetMult, includeScreenshots);
+    results[key] = simulate(key, sonnetMult, includeScreenshots, opusTurns);
   }
 
-  const opusDoneTurn = OPUS_TURNS_PER_TASK * TASKS;
+  const opusDoneTurn = opusTurns * TASKS;
   const sonnetDoneTurn = results.sonnet.finalTurn;
   const maxTurn = Math.max(sonnetDoneTurn, opusDoneTurn) + 2;
 
@@ -482,7 +501,8 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
     });
   });
 
-  const maxY = results.sonnet.finalCost * 1.18;
+  const maxCost = Math.max(results.sonnet.finalCost, results.opus46.finalCost, results.opus47.finalCost);
+  const maxY = maxCost * 1.18;
 
   const annotations = {
     opusDoneLine: {
@@ -494,7 +514,7 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
       borderDash: [4, 4],
       label: {
         display: true,
-        content: `Opus done — 3 tasks in ${opusDoneTurn} turns`,
+        content: `Opus done — ${opusDoneTurn} turns`,
         position: 'start',
         backgroundColor: 'rgba(24, 26, 36, 0.95)',
         color: '#c8ccd4',
@@ -516,7 +536,7 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
       borderDash: [4, 4],
       label: {
         display: true,
-        content: `Sonnet done — 3 tasks in ${sonnetDoneTurn} turns`,
+        content: `Sonnet done — ${sonnetDoneTurn} turns`,
         position: 'start',
         backgroundColor: 'rgba(24, 26, 36, 0.95)',
         color: '#c8ccd4',
@@ -551,7 +571,7 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
           ticks: {
             color: '#9ea3b0',
             font: { family: 'JetBrains Mono', size: 11 },
-            stepSize: 5,
+            stepSize: maxTurn <= 20 ? 2 : 5,
           },
           grid: { color: 'rgba(255,255,255,0.04)' },
           border: { color: 'rgba(255,255,255,0.08)' },
@@ -647,25 +667,27 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
     calloutEl.innerHTML = `At equal efficiency (1×), Sonnet is the cheapest option — <strong>its per-token price advantage is real when it doesn't need extra turns.</strong>`;
   } else {
     calloutEl.innerHTML = `
-      At ${multLabel}× turns, <strong>Sonnet costs ${pctVs46}% more than Opus 4.6</strong> and <strong>${pctVs47}% more than Opus 4.7</strong> for the same 3 tasks — despite being the cheapest model per token. Opus finishes in ${opusDoneTurn} turns while Sonnet needs ${sonnetTurns}.
+      At ${multLabel}× turns, <strong>Sonnet costs ${pctVs46}% more than Opus 4.6</strong> and <strong>${pctVs47}% more than Opus 4.7</strong> for the same task — despite being the cheapest model per token. Opus finishes in ${opusDoneTurn} turns while Sonnet needs ${sonnetTurns}.
     `;
   }
 }
 
-// ── Slider ──
+// ── Sliders ──
 function updateAll() {
   const mult = parseFloat(document.getElementById('sonnetMultiplier').value);
-  const sonnetTurnsPerTask = Math.round(OPUS_TURNS_PER_TASK * mult);
-  const totalSonnet = sonnetTurnsPerTask * TASKS;
+  const opusTurns = parseInt(document.getElementById('taskSize').value);
+  const sonnetTurns = Math.round(opusTurns * mult);
 
   document.getElementById('sliderValue').textContent = mult.toFixed(1) + '×';
-  document.getElementById('sliderDetail').textContent = `${sonnetTurnsPerTask} turns/task · ${totalSonnet} total`;
+  document.getElementById('sliderDetail').textContent = `Sonnet: ${sonnetTurns} turns · Opus: ${opusTurns} turns`;
+  document.getElementById('taskSizeValue').textContent = opusTurns;
 
-  buildChart('chartTextOnly', false, 'statsTextOnly', 'calloutTextOnly', mult);
-  buildChart('chartScreenshots', true, 'statsScreenshots', 'calloutScreenshots', mult);
+  buildChart('chartTextOnly', false, 'statsTextOnly', 'calloutTextOnly', mult, opusTurns);
+  buildChart('chartScreenshots', true, 'statsScreenshots', 'calloutScreenshots', mult, opusTurns);
 }
 
 document.getElementById('sonnetMultiplier').addEventListener('input', updateAll);
+document.getElementById('taskSize').addEventListener('input', updateAll);
 
 // Initial render
 updateAll();
