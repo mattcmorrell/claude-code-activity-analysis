@@ -17,66 +17,68 @@ Build a ~10 minute video presentation for Matt's design team about Claude Code c
 - **Fonts**: DM Sans (headings) + JetBrains Mono (code/numbers) via Google CDN
 - **Navigation**: Arrow keys = whole slides, Click/Spacebar = step through animations within slides
 - **Step-based animation system**: each slide has N internal "steps" triggered by clicks, CSS animations gated by `.slide-X.step-N` class selectors
-- **Iframe embed**: `session-cost-comparison.html` loaded live on the cost comparison slide (slide 11)
-- **15 slides** (was 17 originally, merged cache slides 6+7, merged traction cards from slide 3 into slide 2)
+- **Iframe embed**: `session-cost-comparison.html` loaded live on slide 12
+- **14 slides** (reduced from 15 — deleted standalone screenshots slide, merged screenshot note into /compact slide)
 
-## Current Slide Order (15 slides)
+## Current Slide Order (14 slides)
 1. **Title** — "Token Traction" with subtitle
-2. **Reframe + Cards** — Efficiency vs Traction panels, then 3 traction cards animate in below (merged old slides 2+3). 4 steps.
+2. **Reframe + Cards** — Efficiency vs Traction panels, then 3 traction cards animate in below. 4 steps.
 3. **Playbook** — 5 numbered takeaways: Session length, Keep warm, Multi-claude, Opus over Sonnet, Memory files
-4. **Caching** — Two-panel graphic: Max Plan (flat fee, caching invisible) vs Enterprise/API (pay per token, cache hits save money). Bar segments show cache read vs new tokens. Bridge: "making that green bar as big as possible"
-5. **How Caching Works** — 8-step flow: 5 turns with growing horizontal bars showing cache ratio improvement → "Cache reads 10x cheaper than new tokens" stat → Turn 5 isolates → two tier bars (Base Layer + Conversation) appear underneath with visual mini-timelines showing TTL behavior
-6. **Cache Sweet Spot** — Warmth gradient bar (green → yellow → red)
-7. **Multi-Claude Strategy** — Terminal pane layout: one deep session, rest shallow
-8. **Session Length** — Cumulative context growth visualization (turns stacking)
-9. **Screenshots — The Hidden Weight** — Screenshots as permanent weight that never compresses
-10. **Opus vs Sonnet** — Cost math comparison
-11. **Live Cost Comparison** — Full-width iframe of `session-cost-comparison.html`
-12. **/compact** — Surgical reduction visual (oldest dissolve, middle summarize, recent preserved, screenshots survive)
-13. **/clear — Nuke** — Nuclear option visual. "Everything. Gone." in red. /clear nukes EVERYTHING including base layer.
-14. **Long-Term Memory** — Files that survive /clear (INTENT.md, CLAUDE.md, knowledge.md)
-15. **Closing** — "Think bigger. Use more tokens. Go further." with recap pills
+4. **Caching** — Two-panel graphic: Max Plan (flat fee, caching invisible) vs Enterprise/API (pay per token, cache hits save money). Bridge: "making that green bar as big as possible"
+5. **How Caching Works** — 8-step flow: turns with growing bars → cache stat → tier breakdown with big TTL graphics (amber 1hr base, green 5min conversation). "cache purged after X of inactivity" captions.
+6. **Warm or Cold** — Binary warm/cold blocks (< 5 min / > 5 min), cold rewrite at 1.25× cost callout, small-vs-big cache size comparison (10k=$0.005 vs 150k=$0.56). 3 steps.
+7. **Multi-Claude Strategy** — Bad vs Good side-by-side: Bad = 3 deep sessions (A/B/C) with >5 min gaps going cold; Good = 1 deep (green) warm + 2 shallow (blue). 3 steps.
+8. **Tools to Manage Convo Length** — Two cards: /compact (blue) and /clear (red). 1 step.
+9. **/compact** — Surgical reduction visual (oldest dissolve, middle summarize, recent preserved, screenshots survive). Step 3 animates in "Screenshots don't get compressed" note. 3 steps.
+10. **/clear — Nuke** — Nuclear option visual. "Everything. Gone." in red. /clear nukes EVERYTHING including base layer. 2 steps.
+11. **Opus vs Sonnet** — Step 1: big "1.67×" price callout. Step 2: Sonnet track (12 dots, mix of productive/wasted/fix). Step 3: Opus track (4 dots, all productive). Step 4: "Let's see this live..." 4 steps.
+12. **Live Cost Comparison** — Full-width iframe of `session-cost-comparison.html`
+13. **Long-Term Memory** — Files that survive /clear (INTENT.md, CLAUDE.md, knowledge.md)
+14. **Closing** — "Think bigger. Use more tokens. Go further." with recap pills
 
 ## Current Direction
-Iterating on individual slide visuals. The slide engine, navigation, and step-based click control are all working. Most recent work was on slide 5: replaced text-heavy tier TTL explanations with visual mini-timeline graphics showing turns, gaps, and cache persistence states.
+Iterating on individual slide visuals and narrative flow. Major restructuring complete — slides now flow: cache mechanics → warm/cold → multi-claude → tools intro → compact → clear → model choice → live demo → memory → closing.
 
 ## What's Done
 - Full slide engine with click-controlled step animations (no auto-play)
 - Arrow keys navigate slides, clicks/spacebar step through animations
-- 15-slide structure with all content populated
-- Slide 1: Fixed JS initialization so first slide is visible on load (opacity/transform)
-- Slide 2: Merged old slide 3 traction cards underneath the efficiency/traction panels. Removed "Tokens are intelligence" line. 4 steps.
+- 14-slide structure with all content populated
+- Slide 1: Fixed JS initialization so first slide is visible on load
+- Slide 2: Merged traction cards underneath efficiency/traction panels. 4 steps.
 - Slide 3: Playbook reordered to match deck narrative (Opus moved to #4)
-- Slide 4: Redesigned from "Two Worlds" to "Caching" — bar segment graphics showing cache visibility difference between Max and Enterprise plans. Deleted enterprise-at-work callout.
-- Slide 5: Combined cache timeline + tier breakdown into one continuous 8-step flow
-  - Steps 1-5: turns appear with growing bars showing cache ratio improvement
-  - Step 6: "Cache reads 10x cheaper than new tokens" stat
-  - Step 7: other turns fade, Turn 5 isolates with "What's in that cached portion?"
-  - Step 8: two tier bars with visual mini-timelines underneath:
-    - Base Layer: 5 green ticks with 20-min gap, continuous green persist bar = "cached the whole time"
-    - Conversation: 5 ticks where last 2 turn red after 7-min gap, split bar (green→red) = "expired — cold re-read"
-  - Tier labels: Base = "System prompt / Tools / CLAUDE.md" with "1-hour TTL", Conversation = "Your turns / Responses / Screenshots" with "5-min TTL"
-- Slide 13: /clear nuke — changed survivor label to "Everything. Gone." in red, removed survivor-line element
-- Slide 15: Closing pills reordered, "Opus 4.6 in CLI" → "Opus over Sonnet"
-- Session cost comparison tool embedded as iframe on slide 11
+- Slide 4: "Caching" — bar segment graphics showing cache visibility on Max vs Enterprise
+- Slide 5: Cache timeline + tier breakdown, big TTL graphics (amber "1 hr" / green "5 min"), "cache purged after..." captions. Base layer = amber, Conversation = green for visual distinction.
+- Slide 6: Reworked from 3-zone gradient to binary warm/cold with 1.25× rewrite cost and cache size comparison
+- Slide 7: Bad vs Good multi-claude comparison. Bad side: Deep Session A/B/C with ">5 min gap" dividers, all cold/red. Good side: deep=green, shallow=blue.
+- Slide 8: New "Tools to Manage Convo Length" intro with /compact and /clear cards
+- Slide 9: /compact with screenshot note animating in on step 3
+- Slide 10: /clear nuke — "Everything. Gone." in red
+- Slide 11: Opus vs Sonnet — big 1.67× price callout first, then turn dot tracks, then transition
+- Slide 12: Live iframe embed
+- Slide 13: Long-term memory files
+- Slide 14: Closing with recap pills
+- Deleted standalone screenshots slide — merged screenshot note into /compact slide
 
 ## Rejected Approaches
 - **reveal.js framework**: Too much fighting CSS specificity and layout opinions. Custom engine is ~30 lines of JS and gives full control.
-- **Auto-playing animations with delays**: User needs click control to time animations with talk track. Replaced all `animation-delay` auto-play with step-gated triggers.
-- **Separate slides for cache timeline and tier breakdown**: Merging into one slide gives a smooth continuous flow from growing bars → zoom into cache → tier reveal.
-- **Card-style tier blocks**: Too large, didn't visually connect to the green cached bar above. Switched to proportionally-scaled bar segments directly underneath with labels below.
-- **Blue/orange tier colors**: Confusing — tiers are both parts of the green "cached" segment, so both should be green (different shades).
-- **"Base layer survives /clear"**: Incorrect — /clear nukes everything including the base layer. It's a full cold restart. Fixed on slide 5 insight and slide 13 nuke visual.
-- **Text-heavy tier explanations on slide 5**: Paragraphs explaining TTL behavior were too text-heavy. Replaced with visual mini-timeline graphics showing turns, gaps, and persist bars.
-- **Enterprise callout on slide 4**: "Use Enterprise at work" messaging removed — slide now focuses purely on cache economics.
+- **Auto-playing animations with delays**: User needs click control to time animations with talk track.
+- **Separate slides for cache timeline and tier breakdown**: Merging gives smooth continuous flow.
+- **Card-style tier blocks**: Too large, didn't visually connect to the green cached bar above.
+- **Both tiers green**: Hard to distinguish base from conversation. Fixed: base=amber, conversation=green.
+- **"Base layer survives /clear"**: Incorrect — /clear nukes everything including the base layer.
+- **Text-heavy tier explanations on slide 5**: Replaced with big TTL number graphics.
+- **Mini-timeline graphics for tier TTL**: Too small and fiddly. Replaced with big "1 hr" / "5 min" numbers + gradient bars.
+- **Enterprise callout on slide 4**: Removed — slide focuses purely on cache economics.
+- **3-zone warmth gradient (warm/cooling/cold)**: Cache is binary — warm or cold, no "cooling" state. Replaced with two blocks.
+- **Session length bar chart slide**: Removed as standalone slide. Convo length management now introduced via /compact and /clear tools instead.
+- **Standalone screenshots slide**: Deleted. Screenshot note merged into /compact slide as step 3 animation.
+- **Opus vs Sonnet cost bars (growWidth animation)**: Broken layout. Replaced with simple text summaries.
+- **Deep session = blue in multi-claude**: Changed to green for warm. Shallow = blue.
 
 ## Open Questions
-- Does the tier visual mini-timelines on slide 5 communicate clearly? (Not yet verified in browser)
-- Slide 8 (session length) and slide 5 both show cumulative context growth — is there too much overlap? Different enough (cache vs. cost framing)?
-- Does the multi-claude slide (7) need a more concrete visual?
+- None currently — all slides have been reviewed and iterated on
 
 ## Next Steps
-- Verify tier visual mini-timelines look correct in browser
-- Continue reviewing each slide's visual quality and animation timing
-- Test full run-through for ~10 minute pacing
+- Full run-through review of all 14 slides for visual quality and animation timing
+- Test ~10 minute pacing
 - Record the video presentation
