@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Session Cost Comparison — Claude Code Models</title>
+<title>Session Cost Comparison — Claude Code Models (Opus, Sonnet, Haiku)</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,6 +18,7 @@
     --sonnet-color: #e8784e;
     --opus46-color: #5b9cf5;
     --opus47-color: #b07df0;
+    --haiku-color: #4ecb8d;
     --divider: #2a2d3a;
     --stat-positive: #4ecb8d;
     --stat-negative: #e8784e;
@@ -229,7 +230,7 @@
 
   .stats-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
     margin-top: 16px;
     padding-top: 14px;
@@ -254,6 +255,7 @@
   .stat-card .model-label.sonnet { color: var(--sonnet-color); }
   .stat-card .model-label.opus46 { color: var(--opus46-color); }
   .stat-card .model-label.opus47 { color: var(--opus47-color); }
+  .stat-card .model-label.haiku { color: var(--haiku-color); }
 
   .stat-card .cost-value {
     font-family: 'JetBrains Mono', monospace;
@@ -284,6 +286,55 @@
 
   .comparison-callout strong { color: var(--stat-positive); }
 
+  /* ── Toggle ── */
+  .toggle-bar {
+    display: flex;
+    justify-content: center;
+    padding: 16px 0 0;
+  }
+
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .toggle-label input { display: none; }
+
+  .toggle-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: var(--divider);
+    border-radius: 10px;
+    transition: background 0.2s;
+  }
+
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .toggle-label input:checked + .toggle-switch {
+    background: var(--haiku-color);
+  }
+
+  .toggle-label input:checked + .toggle-switch::after {
+    transform: translateX(16px);
+    background: #fff;
+  }
+
   @media (max-width: 900px) {
     .sliders-inner { gap: 20px; }
     .charts-row { grid-template-columns: 1fr; }
@@ -292,7 +343,7 @@
   @media (max-width: 700px) {
     body { padding: 24px 14px 40px; }
     .assumptions-grid { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
     .chart-wrap { height: 260px; }
     header h1 { font-size: 22px; }
     .slider-row { flex-wrap: wrap; }
@@ -303,7 +354,7 @@
 
 <div class="container">
   <header>
-    <h1>Session Cost: Sonnet 4.6 vs Opus 4.6 vs Opus 4.7</h1>
+    <h1>Session Cost: Opus 4.6 vs Opus 4.7 vs Sonnet 4.6 vs Haiku 4.5</h1>
     <p>One task, one session, then clear context. How much does it actually cost when Sonnet needs multiple attempts to do what Opus gets right the first time?</p>
   </header>
 
@@ -312,7 +363,7 @@
     <div class="sliders-inner">
       <div>
         <h3>How Much Does Sonnet Struggle?</h3>
-        <p class="control-description">How many times longer does Sonnet take to finish the same task? At 3× (what we observe), Sonnet takes 3× as many turns.</p>
+        <p class="control-description">How many times longer does Sonnet take to finish the same task?</p>
         <div style="display:flex; align-items:baseline; gap:16px; margin-bottom:10px; margin-top:14px;">
           <div class="slider-value" id="sliderValue">3.0×</div>
           <div class="slider-detail" id="sliderDetail">Sonnet: 12 turns · Opus: 4 turns</div>
@@ -390,9 +441,19 @@
       <div class="assumption-item"><span class="label">Per turn (text):</span> +5K tokens (productive) / +6K (fix-up)</div>
       <div class="assumption-item"><span class="label">Screenshot mode:</span> 1 screenshot per turn (~2,560 tokens, 4K crop)</div>
       <div class="assumption-item"><span class="label">Screenshots:</span> permanent, incompressible (can't be compacted)</div>
+      <div class="assumption-item"><span class="label">Haiku penalty:</span> 3× more turns than Sonnet (weaker model, more retries)</div>
       <div class="assumption-item"><span class="label">Opus 4.7 tokenizer:</span> +30% token inflation on text (not images)</div>
-      <div class="assumption-item"><span class="label">Cache read rates:</span> Sonnet $0.30 / Opus $0.50 per MTok</div>
+      <div class="assumption-item"><span class="label">Cache read rates:</span> Haiku $0.08 / Sonnet $0.30 / Opus $0.50 per MTok</div>
+      <div class="assumption-item"><span class="label">Output rates:</span> Haiku $4 / Sonnet $15 / Opus $25 per MTok</div>
     </div>
+  </div>
+
+  <div class="toggle-bar">
+    <label class="toggle-label">
+      <input type="checkbox" id="showHaiku" checked>
+      <span class="toggle-switch"></span>
+      Show Haiku 4.5
+    </label>
   </div>
 </div>
 
@@ -432,13 +493,23 @@ const MODEL_CONFIG = {
     color: '#e8784e',
     borderDash: [],
   },
+  haiku: {
+    label: 'Haiku 4.5',
+    cacheReadRate: 0.08 / 1e6,
+    outputRate: 4 / 1e6,
+    outputTokens: 2000,
+    tokenizerMult: 1.0,
+    color: '#4ecb8d',
+    borderDash: [3, 3],
+  },
 };
 
 // ── Simulation ──
 function simulate(modelKey, sonnetMult, includeScreenshots, opusTurns) {
   const m = MODEL_CONFIG[modelKey];
-  const isOneshotModel = modelKey !== 'sonnet';
-  const turnsPerTask = isOneshotModel ? opusTurns : Math.round(opusTurns * sonnetMult);
+  const isOneshotModel = (modelKey === 'opus46' || modelKey === 'opus47');
+  const haikuMult = 3;
+  const turnsPerTask = isOneshotModel ? opusTurns : modelKey === 'haiku' ? Math.round(opusTurns * sonnetMult * haikuMult) : Math.round(opusTurns * sonnetMult);
   const productiveTurns = opusTurns;
 
   const points = [{ turn: 0, cost: 0, context: BASE_CONTEXT * m.tokenizerMult }];
@@ -476,23 +547,26 @@ function formatDollars(v) { return '$' + v.toFixed(2); }
 // ── Chart management ──
 let chartInstances = {};
 
-function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult, opusTurns) {
+function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult, opusTurns, showHaiku) {
   // Destroy existing chart
   if (chartInstances[canvasId]) {
     chartInstances[canvasId].destroy();
   }
 
+  const activeModels = Object.keys(MODEL_CONFIG).filter(k => showHaiku || k !== 'haiku');
+
   const results = {};
-  for (const key of Object.keys(MODEL_CONFIG)) {
+  for (const key of activeModels) {
     results[key] = simulate(key, sonnetMult, includeScreenshots, opusTurns);
   }
 
   const opusDoneTurn = opusTurns * TASKS;
   const sonnetDoneTurn = results.sonnet.finalTurn;
-  const maxTurn = Math.max(sonnetDoneTurn, opusDoneTurn) + 2;
+  const haikuDoneTurn = showHaiku ? results.haiku.finalTurn : 0;
+  const maxTurn = Math.max(sonnetDoneTurn, opusDoneTurn, haikuDoneTurn) + 2;
 
   // Build datasets — main lines
-  const datasets = Object.entries(MODEL_CONFIG).map(([key, m]) => ({
+  const datasets = activeModels.map(key => [key, MODEL_CONFIG[key]]).map(([key, m]) => ({
     label: m.label,
     data: results[key].points.map(p => ({ x: p.turn, y: p.cost })),
     borderColor: m.color,
@@ -509,7 +583,7 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
   }));
 
   // Endpoint dots
-  Object.entries(MODEL_CONFIG).forEach(([key, m]) => {
+  activeModels.forEach(key => { const m = MODEL_CONFIG[key];
     const pts = results[key].points;
     const last = pts[pts.length - 1];
     datasets.push({
@@ -524,7 +598,7 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
     });
   });
 
-  const maxCost = Math.max(results.sonnet.finalCost, results.opus46.finalCost, results.opus47.finalCost);
+  const maxCost = Math.max(...activeModels.map(k => results[k].finalCost));
   const maxY = maxCost * 1.18;
 
   const annotations = {
@@ -548,7 +622,6 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
     },
   };
 
-  // Only show Sonnet done line if it's different from Opus
   if (sonnetMult > 1) {
     annotations.sonnetDoneLine = {
       type: 'line',
@@ -569,6 +642,27 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
         yAdjust: 24,
       },
     };
+    if (showHaiku) {
+      annotations.haikuDoneLine = {
+        type: 'line',
+        xMin: haikuDoneTurn,
+        xMax: haikuDoneTurn,
+        borderColor: 'rgba(78, 203, 141, 0.3)',
+        borderWidth: 1.5,
+        borderDash: [4, 4],
+        label: {
+          display: true,
+          content: `Haiku done — ${haikuDoneTurn} turns`,
+          position: 'start',
+          backgroundColor: 'rgba(24, 26, 36, 0.95)',
+          color: '#c8ccd4',
+          font: { family: 'DM Sans', size: 12, weight: 500 },
+          padding: { x: 8, y: 5 },
+          borderRadius: 4,
+          yAdjust: 48,
+        },
+      };
+    }
   }
 
   const chart = new Chart(document.getElementById(canvasId), {
@@ -662,36 +756,68 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
   const s = results.sonnet.finalCost;
   const o46 = results.opus46.finalCost;
   const o47 = results.opus47.finalCost;
-  const pctVs46 = ((s / o46 - 1) * 100).toFixed(0);
-  const pctVs47 = ((s / o47 - 1) * 100).toFixed(0);
+  const h = showHaiku ? results.haiku.finalCost : null;
   const sonnetTurns = results.sonnet.finalTurn;
+  const haikuTurns = showHaiku ? results.haiku.finalTurn : 0;
   const multLabel = sonnetMult.toFixed(1).replace('.0', '');
 
-  document.getElementById(statsId).innerHTML = `
+  const allCosts = showHaiku ? [o46, o47, s, h] : [o46, o47, s];
+  const cheapest = Math.min(...allCosts);
+
+  function cheapTag(cost) {
+    return cost === cheapest ? '<span class="highlight-good">cheapest</span>' : '';
+  }
+
+  const statsEl = document.getElementById(statsId);
+  statsEl.style.gridTemplateColumns = showHaiku ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)';
+
+  let statsHTML = `
     <div class="stat-card">
       <div class="model-label opus46">Opus 4.6</div>
       <div class="cost-value">${formatDollars(o46)}</div>
-      <div class="cost-detail">${opusDoneTurn} turns · <span class="highlight-good">cheapest</span></div>
+      <div class="cost-detail">${opusDoneTurn} turns ${cheapTag(o46)}</div>
     </div>
     <div class="stat-card">
       <div class="model-label opus47">Opus 4.7</div>
       <div class="cost-value">${formatDollars(o47)}</div>
-      <div class="cost-detail">${opusDoneTurn} turns · +30% tokenizer tax</div>
+      <div class="cost-detail">${opusDoneTurn} turns · +30% tokenizer</div>
     </div>
     <div class="stat-card">
       <div class="model-label sonnet">Sonnet 4.6</div>
       <div class="cost-value">${formatDollars(s)}</div>
-      <div class="cost-detail">${sonnetTurns} turns · <span class="highlight-bad">${multLabel}× more turns</span></div>
-    </div>
-  `;
+      <div class="cost-detail">${sonnetTurns} turns · <span class="highlight-bad">${multLabel}× more</span></div>
+    </div>`;
+
+  if (showHaiku) {
+    statsHTML += `
+    <div class="stat-card">
+      <div class="model-label haiku">Haiku 4.5</div>
+      <div class="cost-value">${formatDollars(h)}</div>
+      <div class="cost-detail">${haikuTurns} turns · 3× worse than Sonnet</div>
+    </div>`;
+  }
+  statsEl.innerHTML = statsHTML;
 
   const calloutEl = document.getElementById(calloutId);
   if (sonnetMult <= 1) {
-    calloutEl.innerHTML = `At equal efficiency (1×), Sonnet is the cheapest option — <strong>its per-token price advantage is real when it doesn't need extra turns.</strong>`;
+    if (showHaiku) {
+      calloutEl.innerHTML = `At equal efficiency (1×), Haiku is cheapest per turn — but at 3× worse than Sonnet, it needs ${haikuTurns} turns vs ${opusDoneTurn} for Opus.`;
+    } else {
+      calloutEl.innerHTML = `At equal efficiency (1×), Sonnet is the cheapest option — <strong>its per-token price advantage is real when it doesn't need extra turns.</strong>`;
+    }
   } else {
-    calloutEl.innerHTML = `
-      At ${multLabel}× turns, <strong>Sonnet costs ${pctVs46}% more than Opus 4.6</strong> and <strong>${pctVs47}% more than Opus 4.7</strong> for the same task — despite being the cheapest model per token. Opus finishes in ${opusDoneTurn} turns while Sonnet needs ${sonnetTurns}.
-    `;
+    const sPctVs46 = ((s / o46 - 1) * 100).toFixed(0);
+    if (showHaiku) {
+      const hVsO46 = h > o46 ? `costs ${((h / o46 - 1) * 100).toFixed(0)}% more` : `saves ${((1 - h / o46) * 100).toFixed(0)}%`;
+      calloutEl.innerHTML = `
+        At ${multLabel}× turns, <strong>Sonnet costs ${sPctVs46}% more than Opus 4.6</strong>. Haiku (3× worse than Sonnet = ${haikuTurns} turns) <strong>${hVsO46} vs Opus 4.6</strong> — cheap tokens vs. massive context growth.
+      `;
+    } else {
+      const sPctVs47 = ((s / o47 - 1) * 100).toFixed(0);
+      calloutEl.innerHTML = `
+        At ${multLabel}× turns, <strong>Sonnet costs ${sPctVs46}% more than Opus 4.6</strong> and <strong>${sPctVs47}% more than Opus 4.7</strong> for the same task — despite being the cheapest model per token. Opus finishes in ${opusDoneTurn} turns while Sonnet needs ${sonnetTurns}.
+      `;
+    }
   }
 }
 
@@ -705,12 +831,15 @@ function updateAll() {
   document.getElementById('sliderDetail').textContent = `Sonnet: ${sonnetTurns} turns · Opus: ${opusTurns} turns`;
   document.getElementById('taskSizeValue').textContent = opusTurns;
 
-  buildChart('chartTextOnly', false, 'statsTextOnly', 'calloutTextOnly', mult, opusTurns);
-  buildChart('chartScreenshots', true, 'statsScreenshots', 'calloutScreenshots', mult, opusTurns);
+  const showHaiku = document.getElementById('showHaiku').checked;
+
+  buildChart('chartTextOnly', false, 'statsTextOnly', 'calloutTextOnly', mult, opusTurns, showHaiku);
+  buildChart('chartScreenshots', true, 'statsScreenshots', 'calloutScreenshots', mult, opusTurns, showHaiku);
 }
 
 document.getElementById('sonnetMultiplier').addEventListener('input', updateAll);
 document.getElementById('taskSize').addEventListener('input', updateAll);
+document.getElementById('showHaiku').addEventListener('change', updateAll);
 
 // Initial render
 updateAll();
