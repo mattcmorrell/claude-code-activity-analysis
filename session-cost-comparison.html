@@ -196,6 +196,98 @@
     color: var(--text-primary);
   }
 
+  /* ── Pricing table ── */
+  .pricing-table-section {
+    margin-bottom: 20px;
+    padding: 20px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 12px;
+  }
+
+  .pricing-table-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+  }
+
+  .pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+  }
+
+  .pricing-table th {
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    padding: 0 16px 10px 0;
+    border-bottom: 1px solid var(--divider);
+    white-space: nowrap;
+  }
+
+  .pricing-table th:first-child { padding-left: 0; }
+
+  .pricing-table td {
+    padding: 10px 16px 10px 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    white-space: nowrap;
+  }
+
+  .pricing-table td:first-child { padding-left: 0; }
+
+  .pricing-table tr:last-child td { border-bottom: none; }
+
+  .pricing-table .model-name {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .pricing-table .model-name.opus46 { color: var(--opus46-color); }
+  .pricing-table .model-name.opus47 { color: var(--opus47-color); }
+  .pricing-table .model-name.sonnet { color: var(--sonnet-color); }
+
+  .pricing-table .effective-mult {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .pricing-table .effective-mult.baseline { color: var(--text-dim); }
+  .pricing-table .effective-mult.mid      { color: var(--opus46-color); }
+  .pricing-table .effective-mult.high     { color: var(--opus47-color); }
+
+  .pricing-table .effective-sub {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+
+  .pricing-table th.col-mult {
+    color: var(--text-secondary);
+  }
+
+  .pricing-table .note {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
   /* ── Charts ── */
   .charts-row {
     display: grid;
@@ -402,6 +494,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -432,6 +525,53 @@
     </div>
   </div>
 
+  <!-- Pricing table -->
+  <div class="pricing-table-section">
+    <h3>Model Pricing (per million tokens)</h3>
+    <table class="pricing-table">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Input</th>
+          <th>Cache Write</th>
+          <th>Cache Read</th>
+          <th>Output</th>
+          <th class="col-mult">Effective Cost vs Sonnet</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="model-name sonnet">Sonnet 4.6</span></td>
+          <td>$3.00</td>
+          <td>$3.75</td>
+          <td>$0.30</td>
+          <td>$15.00</td>
+          <td><span class="effective-mult baseline">1.0×<span class="effective-sub">baseline</span></span></td>
+          <td class="note">—</td>
+        </tr>
+        <tr>
+          <td><span class="model-name opus46">Opus 4.6</span></td>
+          <td>$5.00</td>
+          <td>$6.25</td>
+          <td>$0.50</td>
+          <td>$25.00</td>
+          <td><span class="effective-mult mid">1.67×</span></td>
+          <td class="note">—</td>
+        </tr>
+        <tr>
+          <td><span class="model-name opus47">Opus 4.7</span></td>
+          <td>$5.00</td>
+          <td>$6.25</td>
+          <td>$0.50</td>
+          <td>$25.00</td>
+          <td><span class="effective-mult high">2.2×<span class="effective-sub">price × tokenizer</span></span></td>
+          <td class="note">+30% tokenizer inflation on text (not images)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <!-- Assumptions at bottom -->
   <div class="assumptions-bar">
     <h3>Fixed Assumptions</h3>
@@ -439,15 +579,15 @@
       <div class="assumption-item key-assumption"><span class="label">Tasks in session:</span> 1 (clear context between tasks)</div>
       <div class="assumption-item"><span class="label">Base context:</span> 25K tokens (system prompt, tools, CLAUDE.md)</div>
       <div class="assumption-item"><span class="label">Per turn (text):</span> +5K tokens (productive) / +6K (fix-up)</div>
-      <div class="assumption-item"><span class="label">Output per turn:</span> ~2,500 tokens (tool calls + reasoning)</div>
+      <div class="assumption-item"><span class="label">Output per turn:</span> 50% of new input tokens that turn (~2,500 typical text, ~3,650 with screenshot). Changing this doesn't shift the Opus/Sonnet ratio — all pricing tiers are proportional between models.</div>
       <div class="assumption-item"><span class="label">Screenshots:</span> 1 per turn, 4K crop — ~2,300 tokens (4.6/Sonnet/Haiku) / ~3,733 tokens (4.7, higher res cap)</div>
       <div class="assumption-item"><span class="label">Haiku penalty:</span> 3× more turns than Sonnet (weaker model, more retries)</div>
       <div class="assumption-item"><span class="label">Opus 4.7 tokenizer:</span> +30% token inflation on text and output (not images)</div>
       <div class="assumption-item key-assumption"><span class="label">Cache model:</span> Turn 1 = cold start (all cache writes). Turn 2+ = cache reads + 2% miss rate</div>
-      <div class="assumption-item"><span class="label">Input rates:</span> Haiku $0.80 / Sonnet $3.00 / Opus $5.00 per MTok</div>
-      <div class="assumption-item"><span class="label">Cache write (1.25×):</span> Haiku $1.00 / Sonnet $3.75 / Opus $6.25 per MTok</div>
-      <div class="assumption-item"><span class="label">Cache read (0.1×):</span> Haiku $0.08 / Sonnet $0.30 / Opus $0.50 per MTok</div>
-      <div class="assumption-item"><span class="label">Output rates:</span> Haiku $4 / Sonnet $15 / Opus $25 per MTok</div>
+      <div class="assumption-item"><span class="label">Input rates:</span> Haiku $1.00 / Sonnet $3.00 / Opus $5.00 per MTok</div>
+      <div class="assumption-item"><span class="label">Cache write (1.25×):</span> Haiku $1.25 / Sonnet $3.75 / Opus $6.25 per MTok</div>
+      <div class="assumption-item"><span class="label">Cache read (0.1×):</span> Haiku $0.10 / Sonnet $0.30 / Opus $0.50 per MTok</div>
+      <div class="assumption-item"><span class="label">Output rates:</span> Haiku $5 / Sonnet $15 / Opus $25 per MTok</div>
     </div>
   </div>
 
@@ -467,7 +607,7 @@ const BASE_CONTEXT = 25000;
 const PRODUCTIVE_TURN_GROWTH = 5000;
 const FIXUP_TURN_GROWTH = 6000;
 const CACHE_MISS_RATE = 0.02;
-const OUTPUT_TOKENS = 2500;
+const OUTPUT_FRACTION = 0.5; // output tokens ≈ 50% of new input tokens that turn
 
 // Screenshot tokens vary by model due to different max resize caps.
 // Modeled as a typical 4K Retina crop (~1000×700 logical = 2000×1400 actual pixels).
@@ -509,10 +649,10 @@ const MODEL_CONFIG = {
   },
   haiku: {
     label: 'Haiku 4.5',
-    inputRate: 0.80 / 1e6,
-    cacheWriteRate: 1.00 / 1e6,
-    cacheReadRate: 0.08 / 1e6,
-    outputRate: 4 / 1e6,
+    inputRate: 1.00 / 1e6,
+    cacheWriteRate: 1.25 / 1e6,
+    cacheReadRate: 0.10 / 1e6,
+    outputRate: 5 / 1e6,
     tokenizerMult: 1.0,
     screenshotTokens: 2300,
     color: '#4ecb8d',
@@ -532,7 +672,6 @@ function simulate(modelKey, sonnetMult, includeScreenshots, opusTurns) {
   let context = BASE_CONTEXT * m.tokenizerMult;
   let cumCost = 0;
   let turnIndex = 0;
-  const outputTokens = OUTPUT_TOKENS * m.tokenizerMult;
 
   for (let task = 0; task < TASKS; task++) {
     for (let t = 0; t < turnsPerTask; t++) {
@@ -546,13 +685,12 @@ function simulate(modelKey, sonnetMult, includeScreenshots, opusTurns) {
       const newTokens = textGrowth + imageGrowth;
       context += newTokens;
 
+      const outputTokens = newTokens * OUTPUT_FRACTION;
+
       let turnCost;
       if (turnIndex === 1) {
-        // Cold start: entire context is a cache write (nothing cached yet)
         turnCost = (context * m.cacheWriteRate) + (outputTokens * m.outputRate);
       } else {
-        // Previous context: mostly cache hits, small miss rate at full input price
-        // New tokens this turn: cache write
         const cachedTokens = previousContext * (1 - CACHE_MISS_RATE);
         const missedTokens = previousContext * CACHE_MISS_RATE;
         turnCost = (cachedTokens * m.cacheReadRate)
