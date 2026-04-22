@@ -157,14 +157,25 @@
     border-radius: 10px;
   }
 
-  .assumptions-bar h3 {
+  .assumptions-bar summary {
+    cursor: pointer;
+    list-style: none;
     font-size: 13px;
     font-weight: 600;
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 12px;
+    margin-bottom: 0;
+    user-select: none;
   }
+  .assumptions-bar summary::-webkit-details-marker { display: none; }
+  .assumptions-bar[open] summary { margin-bottom: 12px; }
+  .assumptions-bar summary::after {
+    content: ' ▸';
+    font-size: 10px;
+    opacity: 0.6;
+  }
+  .assumptions-bar[open] summary::after { content: ' ▾'; }
 
   .assumptions-grid {
     display: grid;
@@ -357,13 +368,18 @@
     margin-bottom: 2px;
   }
 
+  .stat-card .cost-sub {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .stat-card .cost-sub.highlight-bad { color: var(--stat-negative); }
+  .stat-card .cost-sub.highlight-good { color: var(--stat-positive); }
+
   .stat-card .cost-detail {
     font-size: 13px;
     color: var(--text-secondary);
   }
-
-  .stat-card .cost-detail .highlight-bad { color: var(--stat-negative); font-weight: 600; }
-  .stat-card .cost-detail .highlight-good { color: var(--stat-positive); font-weight: 600; }
 
   .comparison-callout {
     margin-top: 12px;
@@ -573,8 +589,8 @@
   </div>
 
   <!-- Assumptions at bottom -->
-  <div class="assumptions-bar">
-    <h3>Fixed Assumptions</h3>
+  <details class="assumptions-bar">
+    <summary>Fixed Assumptions</summary>
     <div class="assumptions-grid">
       <div class="assumption-item key-assumption"><span class="label">Tasks in session:</span> 1 (clear context between tasks)</div>
       <div class="assumption-item"><span class="label">Base context:</span> 25K tokens (system prompt, tools, CLAUDE.md)</div>
@@ -589,7 +605,7 @@
       <div class="assumption-item"><span class="label">Cache read (0.1×):</span> Haiku $0.10 / Sonnet $0.30 / Opus $0.50 per MTok</div>
       <div class="assumption-item"><span class="label">Output rates:</span> Haiku $5 / Sonnet $15 / Opus $25 per MTok</div>
     </div>
-  </div>
+  </details>
 
   <div class="toggle-bar">
     <label class="toggle-label">
@@ -634,7 +650,7 @@ const MODEL_CONFIG = {
     tokenizerMult: 1.3,
     screenshotTokens: 3733,
     color: '#b07df0',
-    borderDash: [6, 3],
+    borderDash: [],
   },
   sonnet: {
     label: 'Sonnet 4.6',
@@ -929,6 +945,7 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
   const sonnetTurns = results.sonnet.finalTurn;
   const haikuTurns = showHaiku ? results.haiku.finalTurn : 0;
   const multLabel = sonnetMult.toFixed(1).replace('.0', '');
+  const costRatioVsO46 = (s / o46).toFixed(2).replace(/\.?0+$/, '');
 
   const allCosts = showHaiku ? [o46, o47, s, h] : [o46, o47, s];
   const cheapest = Math.min(...allCosts);
@@ -940,11 +957,17 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
   const statsEl = document.getElementById(statsId);
   statsEl.style.gridTemplateColumns = showHaiku ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)';
 
+  const o46CheapSub = o46 === cheapest ? '<div class="cost-sub highlight-good">cheapest</div>' : '';
+  const sonnetSub = s > o46
+    ? `<div class="cost-sub highlight-bad">${costRatioVsO46}× vs Opus 4.6</div>`
+    : `<div class="cost-sub highlight-good">cheapest</div>`;
+
   let statsHTML = `
     <div class="stat-card">
       <div class="model-label opus46">Opus 4.6</div>
       <div class="cost-value">${formatDollars(o46)}</div>
-      <div class="cost-detail">${opusDoneTurn} turns ${cheapTag(o46)}</div>
+      ${o46CheapSub}
+      <div class="cost-detail">${opusDoneTurn} turns</div>
     </div>
     <div class="stat-card">
       <div class="model-label opus47">Opus 4.7</div>
@@ -954,7 +977,8 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
     <div class="stat-card">
       <div class="model-label sonnet">Sonnet 4.6</div>
       <div class="cost-value">${formatDollars(s)}</div>
-      <div class="cost-detail">${sonnetTurns} turns · <span class="highlight-bad">${multLabel}× more</span></div>
+      ${sonnetSub}
+      <div class="cost-detail">${sonnetTurns} turns</div>
     </div>`;
 
   if (showHaiku) {

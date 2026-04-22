@@ -1,0 +1,2407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token Traction</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --card: #181a24;
+  --card-border: #252836;
+  --text: #e8eaed;
+  --text-secondary: #c8ccd4;
+  --text-dim: #9ea3b0;
+  --sonnet: #e8784e;
+  --opus: #5b9cf5;
+  --opus47: #b07df0;
+  --haiku: #4ecb8d;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+  --green: #22c55e;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+.deck {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 80px;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.slide.exit-left {
+  opacity: 0;
+  transform: translateX(-60px);
+}
+
+/* Progress bar */
+.progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--opus), var(--opus47));
+  transition: width 0.4s ease;
+  z-index: 100;
+}
+
+/* Slide counter */
+.counter {
+  position: fixed;
+  bottom: 24px;
+  right: 32px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-dim);
+  z-index: 100;
+}
+
+/* ============================================ */
+/* COMMON ELEMENTS                              */
+/* ============================================ */
+
+h1 {
+  font-size: 72px;
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin-bottom: 40px;
+}
+
+h3 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--text-secondary);
+}
+
+.subtitle {
+  font-size: 24px;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-top: 16px;
+}
+
+.insight {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--opus);
+  margin-top: 32px;
+  opacity: 0;
+}
+
+.slide.active .insight {
+  animation: fadeUp 0.6s ease forwards;
+  animation-delay: 1.2s;
+}
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+.dim { color: var(--text-dim); }
+.opus-color { color: var(--opus); }
+.sonnet-color { color: var(--sonnet); }
+.green-color { color: var(--green); }
+
+/* ============================================ */
+/* ANIMATION PRIMITIVES                         */
+/* ============================================ */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideFromLeft {
+  from { opacity: 0; transform: translateX(-80px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideFromRight {
+  from { opacity: 0; transform: translateX(80px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes growWidth {
+  from { width: 0; }
+  to { width: var(--target-width); }
+}
+
+@keyframes shrinkHeight {
+  from { height: var(--from-height); opacity: 1; }
+  to { height: var(--to-height); opacity: var(--to-opacity, 1); }
+}
+
+@keyframes dropIn {
+  0% { transform: translateY(-200px) scale(0.5); opacity: 0; }
+  60% { transform: translateY(20px) scale(1.1); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes shockwave {
+  0% { transform: scale(0); opacity: 0.8; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+@keyframes vaporize {
+  0% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+  50% { opacity: 0.5; transform: scale(1.1) translateY(-10px); filter: blur(2px); }
+  100% { opacity: 0; transform: scale(1.3) translateY(-40px); filter: blur(8px); }
+}
+
+@keyframes flashWhite {
+  0% { opacity: 0; }
+  20% { opacity: 0.3; }
+  100% { opacity: 0; }
+}
+
+@keyframes appearLine {
+  from { width: 0; opacity: 0; }
+  to { width: 100%; opacity: 1; }
+}
+
+@keyframes flickerFade {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes gentlePulse {
+  0%, 100% { opacity: 0.7; box-shadow: 0 0 0 rgba(91, 156, 245, 0); }
+  50% { opacity: 1; box-shadow: 0 0 20px rgba(91, 156, 245, 0.15); }
+}
+
+/* ============================================ */
+/* SLIDE 1: TITLE                               */
+/* ============================================ */
+
+.slide-title h1 {
+  font-size: 96px;
+  background: linear-gradient(135deg, var(--opus) 0%, var(--opus47) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+}
+
+.slide-title .subtitle {
+  opacity: 0;
+}
+
+.slide-title.active h1 {
+  animation: scaleIn 0.8s ease forwards;
+}
+
+.slide-title.active .subtitle {
+  animation: fadeUp 0.6s ease forwards;
+  animation-delay: 0.5s;
+}
+
+.title-glow {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(91, 156, 245, 0.08) 0%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ============================================ */
+/* SLIDE 2: REFRAME                             */
+/* ============================================ */
+
+.reframe-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  width: 100%;
+  max-width: 1100px;
+  margin-bottom: 40px;
+}
+
+.reframe-panel {
+  padding: 48px 40px;
+  border-radius: 16px;
+  text-align: center;
+  opacity: 0;
+}
+
+.reframe-panel.efficiency {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.02) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.reframe-panel.traction {
+  background: linear-gradient(135deg, rgba(91, 156, 245, 0.08) 0%, rgba(91, 156, 245, 0.02) 100%);
+  border: 1px solid rgba(91, 156, 245, 0.2);
+}
+
+.slide-reframe.active .efficiency {
+  animation: slideFromLeft 0.7s ease forwards;
+}
+
+.slide-reframe.active .traction {
+  animation: slideFromRight 0.7s ease forwards;
+  animation-delay: 0.3s;
+}
+
+.reframe-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.reframe-panel h2 {
+  font-size: 36px;
+  margin-bottom: 16px;
+}
+
+.efficiency h2 { color: var(--red); }
+.traction h2 { color: var(--opus); }
+
+.gauge-visual {
+  height: 12px;
+  border-radius: 6px;
+  background: #2a1a1a;
+  margin: 24px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 6px;
+  width: 0;
+}
+
+.efficiency .gauge-fill {
+  background: linear-gradient(90deg, var(--red), var(--yellow));
+}
+
+.slide-reframe.active .efficiency .gauge-fill {
+  animation: growWidth 1.5s ease forwards;
+  animation-delay: 0.8s;
+  --target-width: 22%;
+}
+
+.traction .gauge-fill {
+  background: linear-gradient(90deg, var(--opus), var(--green));
+}
+
+.slide-reframe.active .traction .gauge-fill {
+  animation: growWidth 1.2s ease forwards;
+  animation-delay: 1.1s;
+  --target-width: 95%;
+}
+
+.gauge-label {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+.reframe-bottom {
+  font-size: 24px;
+  font-weight: 600;
+  opacity: 0;
+  margin-top: 8px;
+}
+
+.slide-reframe.active .reframe-bottom {
+  animation: fadeUp 0.6s ease forwards;
+  animation-delay: 1.5s;
+}
+
+/* ============================================ */
+/* SLIDE 3: WHAT TRACTION MEANS                 */
+/* ============================================ */
+
+.traction-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1000px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.traction-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  opacity: 0;
+}
+
+.slide-traction.active .traction-card:nth-child(1) {
+  animation: scaleIn 0.5s ease forwards;
+  animation-delay: 0.2s;
+}
+.slide-traction.active .traction-card:nth-child(2) {
+  animation: scaleIn 0.5s ease forwards;
+  animation-delay: 0.5s;
+}
+.slide-traction.active .traction-card:nth-child(3) {
+  animation: scaleIn 0.5s ease forwards;
+  animation-delay: 0.8s;
+}
+
+.traction-card .card-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.traction-card h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.traction-card p {
+  font-size: 16px;
+  color: var(--text-dim);
+}
+
+.traction-tagline {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  opacity: 0;
+}
+
+.slide-traction.active .traction-tagline {
+  animation: fadeUp 0.6s ease forwards;
+  animation-delay: 1.2s;
+}
+
+/* ============================================ */
+/* SLIDE 4: TAKEAWAYS                           */
+/* ============================================ */
+
+.takeaways-list {
+  list-style: none;
+  max-width: 800px;
+  width: 100%;
+}
+
+.takeaways-list li {
+  font-size: 22px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  opacity: 0;
+}
+
+.slide-takeaways.active .takeaways-list li:nth-child(1) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.2s; }
+.slide-takeaways.active .takeaways-list li:nth-child(2) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.4s; }
+.slide-takeaways.active .takeaways-list li:nth-child(3) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.6s; }
+.slide-takeaways.active .takeaways-list li:nth-child(4) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.8s; }
+.slide-takeaways.active .takeaways-list li:nth-child(5) { animation: fadeUp 0.5s ease forwards; animation-delay: 1.0s; }
+
+.takeaway-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  color: var(--opus);
+  font-weight: 600;
+  min-width: 28px;
+}
+
+.takeaway-cta {
+  font-size: 18px;
+  color: var(--text-dim);
+  margin-top: 32px;
+  opacity: 0;
+}
+
+.slide-takeaways.active .takeaway-cta {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 1.4s;
+}
+
+/* ============================================ */
+/* SLIDE 5: MAX VS ENTERPRISE                   */
+/* ============================================ */
+
+.plans-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: 1000px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.plan-panel {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 36px 32px;
+  opacity: 0;
+  border: 1px solid var(--card-border);
+}
+
+.slide-plans.active .plan-panel:nth-child(1) {
+  animation: slideFromLeft 0.6s ease forwards;
+  animation-delay: 0.2s;
+}
+
+.slide-plans.active .plan-panel:nth-child(2) {
+  animation: slideFromRight 0.6s ease forwards;
+  animation-delay: 0.5s;
+}
+
+.plan-panel h3 {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.plan-panel:nth-child(1) h3 { color: var(--text-secondary); }
+.plan-panel:nth-child(2) h3 { color: var(--opus); }
+
+.plan-visual {
+  height: 80px;
+  position: relative;
+  margin: 20px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.plan-visual-flat {
+  background: linear-gradient(90deg, rgba(158,163,176,0.1) 0%, rgba(158,163,176,0.1) 75%, transparent 75%);
+  border: 1px dashed rgba(158,163,176,0.3);
+}
+
+.flat-line {
+  position: absolute;
+  top: 50%;
+  left: 8%;
+  width: 0;
+  height: 2px;
+  background: var(--text-dim);
+}
+
+.slide-plans.active .flat-line {
+  animation: growWidth 1s ease forwards;
+  animation-delay: 0.8s;
+  --target-width: 65%;
+}
+
+.rate-wall {
+  position: absolute;
+  right: 22%;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  background: var(--yellow);
+  opacity: 0;
+  border-radius: 2px;
+}
+
+.slide-plans.active .rate-wall {
+  animation: fadeIn 0.3s ease forwards;
+  animation-delay: 1.6s;
+}
+
+.wall-label {
+  position: absolute;
+  right: 10%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--yellow);
+  opacity: 0;
+}
+
+.slide-plans.active .wall-label {
+  animation: fadeIn 0.3s ease forwards;
+  animation-delay: 1.8s;
+}
+
+.plan-visual-rising {
+  border: 1px dashed rgba(91, 156, 245, 0.3);
+  background: linear-gradient(135deg, rgba(91, 156, 245, 0.02) 0%, rgba(91, 156, 245, 0.06) 100%);
+}
+
+.rising-line {
+  position: absolute;
+  bottom: 15%;
+  left: 8%;
+  width: 0;
+  height: 2px;
+  background: var(--opus);
+  transform-origin: left bottom;
+  transform: rotate(-25deg);
+}
+
+.slide-plans.active .rising-line {
+  animation: growWidth 1.2s ease forwards;
+  animation-delay: 1.1s;
+  --target-width: 80%;
+}
+
+.plan-label {
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.plan-panel:nth-child(1) .plan-label { color: var(--text-dim); }
+.plan-panel:nth-child(2) .plan-label { color: var(--opus); }
+
+.plans-bridge {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+  opacity: 0;
+  margin-bottom: 16px;
+}
+
+.slide-plans.active .plans-bridge {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 1.8s;
+}
+
+.plans-callout {
+  background: rgba(91, 156, 245, 0.06);
+  border: 1px solid rgba(91, 156, 245, 0.15);
+  border-radius: 12px;
+  padding: 20px 28px;
+  max-width: 700px;
+  text-align: center;
+  opacity: 0;
+}
+
+.slide-plans.active .plans-callout {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 2.2s;
+}
+
+.plans-callout p {
+  font-size: 17px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.plans-callout strong {
+  color: var(--opus);
+}
+
+/* ============================================ */
+/* SLIDE 6: HOW CACHING WORKS                   */
+/* ============================================ */
+
+.cache-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 900px;
+  width: 100%;
+}
+
+.cache-turn {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  opacity: 0;
+}
+
+.slide-cache.active .cache-turn:nth-child(1) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.3s; }
+.slide-cache.active .cache-turn:nth-child(2) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.9s; }
+.slide-cache.active .cache-turn:nth-child(3) { animation: fadeUp 0.5s ease forwards; animation-delay: 1.5s; }
+
+.turn-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text-dim);
+  min-width: 100px;
+  text-align: right;
+}
+
+.turn-bar-container {
+  flex: 1;
+  height: 48px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.turn-bar-segment {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  border-radius: 8px;
+}
+
+.seg-write {
+  background: linear-gradient(135deg, rgba(91, 156, 245, 0.35), rgba(91, 156, 245, 0.2));
+  border: 1px solid rgba(91, 156, 245, 0.3);
+}
+
+.seg-read {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.15));
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.seg-miss {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.15));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.turn-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 80px;
+}
+
+.cache-stat {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--green);
+  text-align: center;
+  margin-top: 32px;
+  opacity: 0;
+}
+
+.slide-cache.active .cache-stat {
+  animation: scaleIn 0.5s ease forwards;
+  animation-delay: 2s;
+}
+
+/* ============================================ */
+/* SLIDE 7: TWO CACHE TIERS                     */
+/* ============================================ */
+
+.tiers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 800px;
+  width: 100%;
+}
+
+.tier-block {
+  border-radius: 16px;
+  padding: 32px 36px;
+  opacity: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.tier-base {
+  background: linear-gradient(135deg, rgba(91, 156, 245, 0.1), rgba(91, 156, 245, 0.03));
+  border: 1px solid rgba(91, 156, 245, 0.25);
+}
+
+.tier-conv {
+  background: linear-gradient(135deg, rgba(232, 120, 78, 0.1), rgba(232, 120, 78, 0.03));
+  border: 1px solid rgba(232, 120, 78, 0.25);
+}
+
+.slide-tiers.active .tier-base {
+  animation: slideFromLeft 0.6s ease forwards;
+  animation-delay: 0.3s;
+}
+
+.slide-tiers.active .tier-conv {
+  animation: slideFromRight 0.6s ease forwards;
+  animation-delay: 0.6s;
+}
+
+.slide-tiers.active .tier-base {
+  animation-name: slideFromLeft;
+}
+
+.tier-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tier-name {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.tier-base .tier-name { color: var(--opus); }
+.tier-conv .tier-name { color: var(--sonnet); }
+
+.tier-ttl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 8px;
+}
+
+.tier-base .tier-ttl {
+  background: rgba(91, 156, 245, 0.15);
+  color: var(--opus);
+}
+
+.tier-conv .tier-ttl {
+  background: rgba(232, 120, 78, 0.15);
+  color: var(--sonnet);
+}
+
+.tier-items {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.tier-pulse {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+.tier-base .tier-pulse {
+  background: radial-gradient(circle, rgba(91,156,245,0.15), transparent);
+  animation: gentlePulse 3s ease-in-out infinite;
+}
+
+.tier-conv .tier-pulse {
+  background: radial-gradient(circle, rgba(232,120,78,0.15), transparent);
+  animation: flickerFade 2s ease-in-out infinite;
+}
+
+.tiers-insight {
+  font-size: 20px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--text-secondary);
+  opacity: 0;
+  margin-top: 16px;
+}
+
+.tiers-insight code {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--sonnet);
+  background: rgba(232,120,78,0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.slide-tiers.active .tiers-insight {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 1.2s;
+}
+
+/* ============================================ */
+/* SLIDE 8: SESSION LENGTH                      */
+/* ============================================ */
+
+.session-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  max-width: 900px;
+  width: 100%;
+  height: 340px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+}
+
+.session-bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  opacity: 0;
+}
+
+.session-bar {
+  width: 100%;
+  max-width: 80px;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  height: 0;
+}
+
+.bar-layer {
+  width: 100%;
+  min-height: 4px;
+}
+
+.bar-layer-old {
+  background: rgba(91, 156, 245, 0.15);
+  border-top: 1px solid rgba(91, 156, 245, 0.1);
+}
+
+.bar-layer-new {
+  background: rgba(91, 156, 245, 0.4);
+  border: 1px solid rgba(91, 156, 245, 0.3);
+}
+
+.bar-turn-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 12px;
+}
+
+.bar-cost-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--opus);
+  position: absolute;
+  top: -22px;
+  width: 100%;
+  text-align: center;
+}
+
+.slide-session.active .session-bar-group:nth-child(1) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.2s; }
+.slide-session.active .session-bar-group:nth-child(2) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.35s; }
+.slide-session.active .session-bar-group:nth-child(3) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.5s; }
+.slide-session.active .session-bar-group:nth-child(4) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.65s; }
+.slide-session.active .session-bar-group:nth-child(5) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.8s; }
+.slide-session.active .session-bar-group:nth-child(6) { animation: fadeUp 0.5s ease forwards; animation-delay: 0.95s; }
+.slide-session.active .session-bar-group:nth-child(7) { animation: fadeUp 0.5s ease forwards; animation-delay: 1.1s; }
+.slide-session.active .session-bar-group:nth-child(8) { animation: fadeUp 0.5s ease forwards; animation-delay: 1.25s; }
+
+.slide-session.active .session-bar {
+  animation: growBar 0.8s ease forwards;
+  animation-delay: inherit;
+}
+
+@keyframes growBar {
+  from { height: 0; }
+  to { height: var(--bar-height); }
+}
+
+.session-insight {
+  font-size: 22px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 28px;
+  opacity: 0;
+}
+
+.session-insight code {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--opus);
+}
+
+.slide-session.active .session-insight {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 1.6s;
+}
+
+/* ============================================ */
+/* SLIDE 9: SCREENSHOTS                         */
+/* ============================================ */
+
+.screenshot-demo {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  max-width: 900px;
+  width: 100%;
+}
+
+.context-stack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ctx-block {
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0;
+  transition: height 1s ease, padding 1s ease, opacity 0.5s ease;
+}
+
+.ctx-text {
+  background: rgba(91, 156, 245, 0.12);
+  border: 1px solid rgba(91, 156, 245, 0.2);
+  color: var(--opus);
+  height: 40px;
+}
+
+.ctx-screenshot {
+  background: rgba(232, 120, 78, 0.15);
+  border: 2px solid rgba(232, 120, 78, 0.35);
+  color: var(--sonnet);
+  height: 56px;
+  font-weight: 600;
+}
+
+.slide-screenshots.active .ctx-block:nth-child(1) { animation: fadeUp 0.4s ease forwards; animation-delay: 0.2s; }
+.slide-screenshots.active .ctx-block:nth-child(2) { animation: fadeUp 0.4s ease forwards; animation-delay: 0.35s; }
+.slide-screenshots.active .ctx-block:nth-child(3) { animation: fadeUp 0.4s ease forwards; animation-delay: 0.5s; }
+.slide-screenshots.active .ctx-block:nth-child(4) { animation: fadeUp 0.4s ease forwards; animation-delay: 0.65s; }
+.slide-screenshots.active .ctx-block:nth-child(5) { animation: fadeUp 0.4s ease forwards; animation-delay: 0.8s; }
+.slide-screenshots.active .ctx-block:nth-child(6) { animation: fadeUp 0.4s ease forwards; animation-delay: 0.95s; }
+.slide-screenshots.active .ctx-block:nth-child(7) { animation: fadeUp 0.4s ease forwards; animation-delay: 1.1s; }
+
+.screenshot-info {
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  opacity: 0;
+}
+
+.slide-screenshots.active .screenshot-info {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 1.4s;
+}
+
+.ss-stat {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.ss-stat .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--sonnet);
+}
+
+.ss-stat .label {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.ss-killer {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--sonnet);
+  text-align: center;
+  padding: 16px;
+  background: rgba(232,120,78,0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(232,120,78,0.2);
+}
+
+/* Compaction demo animation for screenshots */
+.slide-screenshots.active .ctx-text.will-shrink {
+  animation: fadeUp 0.4s ease forwards, textShrink 0.8s ease forwards 2.5s;
+}
+
+@keyframes textShrink {
+  to { height: 20px; padding: 4px 16px; opacity: 0.4; font-size: 10px; }
+}
+
+.ctx-screenshot.wont-shrink {
+  /* screenshots stay put during compaction demo */
+}
+
+/* ============================================ */
+/* SLIDE 10: CACHE SWEET SPOT                   */
+/* ============================================ */
+
+.warmth-container {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+}
+
+.warmth-bar {
+  height: 64px;
+  border-radius: 12px;
+  background: linear-gradient(90deg,
+    rgba(34, 197, 94, 0.5) 0%,
+    rgba(34, 197, 94, 0.3) 33%,
+    rgba(245, 158, 11, 0.3) 33%,
+    rgba(245, 158, 11, 0.4) 66%,
+    rgba(239, 68, 68, 0.3) 66%,
+    rgba(239, 68, 68, 0.5) 100%
+  );
+  position: relative;
+  margin: 40px 0 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+  opacity: 0;
+}
+
+.slide-sweetspot.active .warmth-bar {
+  animation: scaleIn 0.6s ease forwards;
+  animation-delay: 0.3s;
+}
+
+.warmth-zone {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.zone-green { left: 8%; color: var(--green); }
+.zone-yellow { left: 42%; color: var(--yellow); }
+.zone-red { left: 76%; color: var(--red); }
+
+.warmth-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4%;
+  opacity: 0;
+}
+
+.slide-sweetspot.active .warmth-labels {
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: 0.8s;
+}
+
+.warmth-label {
+  font-size: 15px;
+  color: var(--text-dim);
+}
+
+.warmth-label:nth-child(1) { color: var(--green); }
+.warmth-label:nth-child(2) { color: var(--yellow); }
+.warmth-label:nth-child(3) { color: var(--red); }
+
+.sweetspot-insight {
+  font-size: 28px;
+  font-weight: 600;
+  margin-top: 48px;
+  opacity: 0;
+}
+
+.slide-sweetspot.active .sweetspot-insight {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 1.2s;
+}
+
+/* ============================================ */
+/* SLIDE 11: OPUS VS SONNET                     */
+/* ============================================ */
+
+.model-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  max-width: 1000px;
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.model-track {
+  opacity: 0;
+}
+
+.slide-opus-sonnet.active .model-track:nth-child(1) {
+  animation: slideFromLeft 0.6s ease forwards;
+  animation-delay: 0.2s;
+}
+
+.slide-opus-sonnet.active .model-track:nth-child(2) {
+  animation: slideFromRight 0.6s ease forwards;
+  animation-delay: 0.4s;
+}
+
+.model-track h3 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.track-sonnet h3 { color: var(--sonnet); }
+.track-opus h3 { color: var(--opus); }
+
+.turn-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.turn-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  opacity: 0;
+}
+
+.dot-productive {
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--green);
+}
+
+.dot-wasted {
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--red);
+}
+
+.dot-fix {
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--yellow);
+}
+
+.slide-opus-sonnet.active .turn-dot {
+  animation: scaleIn 0.3s ease forwards;
+}
+
+.track-sonnet .turn-dot:nth-child(1) { animation-delay: 0.6s; }
+.track-sonnet .turn-dot:nth-child(2) { animation-delay: 0.7s; }
+.track-sonnet .turn-dot:nth-child(3) { animation-delay: 0.8s; }
+.track-sonnet .turn-dot:nth-child(4) { animation-delay: 0.9s; }
+.track-sonnet .turn-dot:nth-child(5) { animation-delay: 1.0s; }
+.track-sonnet .turn-dot:nth-child(6) { animation-delay: 1.1s; }
+.track-sonnet .turn-dot:nth-child(7) { animation-delay: 1.2s; }
+.track-sonnet .turn-dot:nth-child(8) { animation-delay: 1.3s; }
+.track-sonnet .turn-dot:nth-child(9) { animation-delay: 1.4s; }
+.track-sonnet .turn-dot:nth-child(10) { animation-delay: 1.5s; }
+.track-sonnet .turn-dot:nth-child(11) { animation-delay: 1.6s; }
+.track-sonnet .turn-dot:nth-child(12) { animation-delay: 1.7s; }
+
+.track-opus .turn-dot:nth-child(1) { animation-delay: 0.8s; }
+.track-opus .turn-dot:nth-child(2) { animation-delay: 0.9s; }
+.track-opus .turn-dot:nth-child(3) { animation-delay: 1.0s; }
+.track-opus .turn-dot:nth-child(4) { animation-delay: 1.1s; }
+
+.model-cost-bar {
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  width: 0;
+}
+
+.track-sonnet .model-cost-bar {
+  background: rgba(232, 120, 78, 0.2);
+  border: 1px solid rgba(232, 120, 78, 0.3);
+  color: var(--sonnet);
+}
+
+.track-opus .model-cost-bar {
+  background: rgba(91, 156, 245, 0.2);
+  border: 1px solid rgba(91, 156, 245, 0.3);
+  color: var(--opus);
+}
+
+.slide-opus-sonnet.active .track-sonnet .model-cost-bar {
+  animation: growWidth 1s ease forwards;
+  animation-delay: 1.8s;
+  --target-width: 100%;
+}
+
+.slide-opus-sonnet.active .track-opus .model-cost-bar {
+  animation: growWidth 1s ease forwards;
+  animation-delay: 1.8s;
+  --target-width: 55%;
+}
+
+.compare-transition {
+  font-size: 18px;
+  color: var(--text-dim);
+  opacity: 0;
+}
+
+.slide-opus-sonnet.active .compare-transition {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 2.5s;
+}
+
+/* ============================================ */
+/* SLIDE 12: LIVE IFRAME                        */
+/* ============================================ */
+
+.iframe-container {
+  width: 100%;
+  height: 100%;
+  max-width: 1400px;
+  max-height: calc(100vh - 120px);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  opacity: 0;
+}
+
+.slide-iframe.active .iframe-container {
+  animation: scaleIn 0.5s ease forwards;
+  animation-delay: 0.2s;
+}
+
+.iframe-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.iframe-hint {
+  position: absolute;
+  bottom: 56px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-dim);
+  opacity: 0;
+}
+
+.slide-iframe.active .iframe-hint {
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: 0.8s;
+}
+
+/* ============================================ */
+/* SLIDE 13: MULTI-CLAUDE                       */
+/* ============================================ */
+
+.terminal-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  max-width: 700px;
+  width: 100%;
+  height: 280px;
+  margin-bottom: 40px;
+}
+
+.term-pane {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+}
+
+.term-deep {
+  grid-row: 1 / 3;
+  border: 2px solid rgba(91, 156, 245, 0.4);
+  box-shadow: 0 0 30px rgba(91, 156, 245, 0.08);
+}
+
+.slide-multi.active .term-deep {
+  animation: scaleIn 0.5s ease forwards, gentlePulse 3s ease-in-out infinite 1s;
+  animation-delay: 0.3s;
+}
+
+.term-shallow {
+  border: 1px solid var(--card-border);
+}
+
+.slide-multi.active .term-shallow:nth-child(2) {
+  animation: scaleIn 0.4s ease forwards;
+  animation-delay: 0.6s;
+}
+
+.slide-multi.active .term-shallow:nth-child(3) {
+  animation: scaleIn 0.4s ease forwards;
+  animation-delay: 0.8s;
+}
+
+.term-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.term-deep .term-title { color: var(--opus); }
+.term-shallow .term-title { color: var(--text-dim); }
+
+.term-status {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.term-deep .term-status { color: rgba(91, 156, 245, 0.6); }
+.term-shallow .term-status { color: rgba(158, 163, 176, 0.4); }
+
+.multi-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 600px;
+}
+
+.multi-rule {
+  font-size: 18px;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slide-multi.active .multi-rule:nth-child(1) { animation: fadeUp 0.4s ease forwards; animation-delay: 1.0s; }
+.slide-multi.active .multi-rule:nth-child(2) { animation: fadeUp 0.4s ease forwards; animation-delay: 1.3s; }
+.slide-multi.active .multi-rule:nth-child(3) { animation: fadeUp 0.4s ease forwards; animation-delay: 1.6s; }
+
+.rule-icon { font-size: 20px; }
+
+/* ============================================ */
+/* SLIDE 14: COMPACT                            */
+/* ============================================ */
+
+.compact-demo {
+  display: flex;
+  gap: 60px;
+  align-items: center;
+  max-width: 900px;
+  width: 100%;
+}
+
+.compact-stack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.compact-block {
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0;
+  transition: all 1s ease;
+}
+
+.cb-old {
+  background: rgba(158, 163, 176, 0.08);
+  border: 1px solid rgba(158, 163, 176, 0.12);
+  color: var(--text-dim);
+  height: 36px;
+}
+
+.cb-mid {
+  background: rgba(91, 156, 245, 0.1);
+  border: 1px solid rgba(91, 156, 245, 0.2);
+  color: var(--opus);
+  height: 36px;
+}
+
+.cb-recent {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: var(--green);
+  height: 36px;
+}
+
+.cb-screenshot {
+  background: rgba(232, 120, 78, 0.15);
+  border: 2px solid rgba(232, 120, 78, 0.35);
+  color: var(--sonnet);
+  height: 48px;
+  font-weight: 600;
+}
+
+.slide-compact.active .compact-block { animation: fadeUp 0.3s ease forwards; }
+.slide-compact.active .compact-block:nth-child(1) { animation-delay: 0.15s; }
+.slide-compact.active .compact-block:nth-child(2) { animation-delay: 0.25s; }
+.slide-compact.active .compact-block:nth-child(3) { animation-delay: 0.35s; }
+.slide-compact.active .compact-block:nth-child(4) { animation-delay: 0.45s; }
+.slide-compact.active .compact-block:nth-child(5) { animation-delay: 0.55s; }
+.slide-compact.active .compact-block:nth-child(6) { animation-delay: 0.65s; }
+.slide-compact.active .compact-block:nth-child(7) { animation-delay: 0.75s; }
+.slide-compact.active .compact-block:nth-child(8) { animation-delay: 0.85s; }
+.slide-compact.active .compact-block:nth-child(9) { animation-delay: 0.95s; }
+.slide-compact.active .compact-block:nth-child(10) { animation-delay: 1.05s; }
+
+/* Compaction animations */
+.slide-compact.active.compacting .cb-old {
+  animation: compactDissolve 0.8s ease forwards;
+}
+
+.slide-compact.active.compacting .cb-mid {
+  animation: compactShrink 0.8s ease forwards;
+  animation-delay: 0.3s;
+}
+
+.slide-compact.active.compacting .cb-recent {
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.15);
+}
+
+.slide-compact.active.compacting .cb-screenshot {
+  /* stays exactly the same — that's the point */
+  box-shadow: 0 0 12px rgba(232, 120, 78, 0.2);
+}
+
+@keyframes compactDissolve {
+  to { opacity: 0; height: 0; padding: 0; margin: 0; border-width: 0; overflow: hidden; }
+}
+
+@keyframes compactShrink {
+  to { height: 20px; padding: 4px 14px; font-size: 10px; opacity: 0.6; }
+}
+
+.compact-labels {
+  flex: 0 0 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.compact-label {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+}
+
+.slide-compact.active.compacting .compact-label {
+  animation: fadeUp 0.4s ease forwards;
+}
+
+.cl-removed {
+  background: rgba(158,163,176,0.06);
+  border: 1px solid rgba(158,163,176,0.12);
+  color: var(--text-dim);
+  animation-delay: 2.2s !important;
+}
+
+.cl-summarized {
+  background: rgba(91,156,245,0.06);
+  border: 1px solid rgba(91,156,245,0.15);
+  color: var(--opus);
+  animation-delay: 2.5s !important;
+}
+
+.cl-preserved {
+  background: rgba(34,197,94,0.06);
+  border: 1px solid rgba(34,197,94,0.15);
+  color: var(--green);
+  animation-delay: 2.8s !important;
+}
+
+.cl-stuck {
+  background: rgba(232,120,78,0.06);
+  border: 1px solid rgba(232,120,78,0.15);
+  color: var(--sonnet);
+  animation-delay: 3.1s !important;
+}
+
+/* ============================================ */
+/* SLIDE 15: CLEAR NUKE                         */
+/* ============================================ */
+
+.nuke-scene {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.nuke-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 300px;
+  position: absolute;
+  top: 40px;
+}
+
+.nuke-block {
+  height: 28px;
+  border-radius: 4px;
+  opacity: 0;
+}
+
+.nuke-block.nb-text {
+  background: rgba(91, 156, 245, 0.15);
+  border: 1px solid rgba(91, 156, 245, 0.2);
+}
+
+.nuke-block.nb-screenshot {
+  background: rgba(232, 120, 78, 0.15);
+  border: 1px solid rgba(232, 120, 78, 0.3);
+  height: 36px;
+}
+
+.slide-nuke.active .nuke-block {
+  animation: fadeIn 0.2s ease forwards;
+}
+
+.slide-nuke.active .nuke-block:nth-child(1) { animation-delay: 0.1s; }
+.slide-nuke.active .nuke-block:nth-child(2) { animation-delay: 0.2s; }
+.slide-nuke.active .nuke-block:nth-child(3) { animation-delay: 0.3s; }
+.slide-nuke.active .nuke-block:nth-child(4) { animation-delay: 0.4s; }
+.slide-nuke.active .nuke-block:nth-child(5) { animation-delay: 0.5s; }
+.slide-nuke.active .nuke-block:nth-child(6) { animation-delay: 0.6s; }
+.slide-nuke.active .nuke-block:nth-child(7) { animation-delay: 0.7s; }
+.slide-nuke.active .nuke-block:nth-child(8) { animation-delay: 0.8s; }
+
+.nuke-symbol {
+  font-size: 120px;
+  position: absolute;
+  top: -200px;
+  opacity: 0;
+  z-index: 10;
+  filter: drop-shadow(0 0 40px rgba(239, 68, 68, 0.5));
+}
+
+.slide-nuke.active.nuking .nuke-symbol {
+  animation: dropIn 0.8s ease forwards;
+  animation-delay: 1.5s;
+}
+
+.nuke-flash {
+  position: absolute;
+  inset: -100px;
+  background: white;
+  opacity: 0;
+  border-radius: 50%;
+  z-index: 5;
+}
+
+.slide-nuke.active.nuking .nuke-flash {
+  animation: flashWhite 0.6s ease forwards;
+  animation-delay: 2.1s;
+}
+
+.nuke-shockwave {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(239, 68, 68, 0.4);
+  opacity: 0;
+  z-index: 6;
+}
+
+.slide-nuke.active.nuking .nuke-shockwave {
+  animation: shockwave 1s ease forwards;
+  animation-delay: 2.2s;
+}
+
+.slide-nuke.active.nuking .nuke-block {
+  animation: vaporize 0.6s ease forwards;
+  animation-delay: 2.2s;
+}
+
+.nuke-survivor {
+  position: absolute;
+  bottom: 80px;
+  width: 80%;
+  opacity: 0;
+}
+
+.survivor-line {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--opus), transparent);
+  border-radius: 2px;
+  width: 0;
+}
+
+.slide-nuke.active.nuking .survivor-line {
+  animation: appearLine 1s ease forwards;
+  animation-delay: 3s;
+}
+
+.slide-nuke.active.nuking .nuke-survivor {
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: 3s;
+}
+
+.survivor-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--opus);
+  text-align: center;
+  margin-top: 8px;
+}
+
+.nuke-bottom {
+  position: absolute;
+  bottom: 16px;
+  display: flex;
+  gap: 40px;
+  opacity: 0;
+}
+
+.slide-nuke.active.nuking .nuke-bottom {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 3.5s;
+}
+
+.nuke-guide {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.ng-compact {
+  color: var(--opus);
+  background: rgba(91,156,245,0.08);
+  border: 1px solid rgba(91,156,245,0.15);
+}
+
+.ng-clear {
+  color: var(--sonnet);
+  background: rgba(232,120,78,0.08);
+  border: 1px solid rgba(232,120,78,0.15);
+}
+
+/* ============================================ */
+/* SLIDE 16: LONG-TERM MEMORY                   */
+/* ============================================ */
+
+.memory-files {
+  display: flex;
+  gap: 24px;
+  max-width: 900px;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.memory-file {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 28px 24px;
+  width: 240px;
+  text-align: center;
+  opacity: 0;
+  position: relative;
+}
+
+.slide-memory.active .memory-file:nth-child(1) {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 0.3s;
+}
+
+.slide-memory.active .memory-file:nth-child(2) {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 0.6s;
+}
+
+.slide-memory.active .memory-file:nth-child(3) {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 0.9s;
+}
+
+.file-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.file-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--opus);
+  margin-bottom: 8px;
+}
+
+.file-desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.memory-tagline {
+  font-size: 24px;
+  font-weight: 600;
+  opacity: 0;
+}
+
+.memory-tagline code {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--sonnet);
+  background: rgba(232,120,78,0.1);
+  padding: 2px 10px;
+  border-radius: 4px;
+}
+
+.slide-memory.active .memory-tagline {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: 1.4s;
+}
+
+/* ============================================ */
+/* SLIDE 17: CLOSING                            */
+/* ============================================ */
+
+.slide-closing h1 {
+  font-size: 56px;
+  text-align: center;
+  line-height: 1.4;
+  opacity: 0;
+}
+
+.slide-closing h1 span {
+  display: block;
+}
+
+.slide-closing.active h1 {
+  animation: scaleIn 0.7s ease forwards;
+  animation-delay: 0.2s;
+}
+
+.closing-recap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 800px;
+  justify-content: center;
+  margin-top: 48px;
+}
+
+.closing-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  color: var(--text-dim);
+  opacity: 0;
+}
+
+.slide-closing.active .closing-pill:nth-child(1) { animation: fadeUp 0.4s ease forwards; animation-delay: 0.8s; }
+.slide-closing.active .closing-pill:nth-child(2) { animation: fadeUp 0.4s ease forwards; animation-delay: 0.95s; }
+.slide-closing.active .closing-pill:nth-child(3) { animation: fadeUp 0.4s ease forwards; animation-delay: 1.1s; }
+.slide-closing.active .closing-pill:nth-child(4) { animation: fadeUp 0.4s ease forwards; animation-delay: 1.25s; }
+.slide-closing.active .closing-pill:nth-child(5) { animation: fadeUp 0.4s ease forwards; animation-delay: 1.4s; }
+
+.closing-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(91, 156, 245, 0.06) 0%, rgba(176, 125, 240, 0.04) 50%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter"></div>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: TITLE -->
+  <div class="slide slide-title active" data-slide="1">
+    <div class="title-glow"></div>
+    <h1>Token Traction</h1>
+    <p class="subtitle">How to go further with Claude Code</p>
+  </div>
+
+  <!-- SLIDE 2: REFRAME -->
+  <div class="slide slide-reframe" data-slide="2">
+    <div class="reframe-container">
+      <div class="reframe-panel efficiency">
+        <span class="reframe-icon">&#9981;</span>
+        <h2>Efficiency</h2>
+        <div class="gauge-visual">
+          <div class="gauge-fill"></div>
+        </div>
+        <div class="gauge-label">Scarcity. Conservation. Running low.</div>
+      </div>
+      <div class="reframe-panel traction">
+        <span class="reframe-icon">&#9881;</span>
+        <h2>Traction</h2>
+        <div class="gauge-visual">
+          <div class="gauge-fill"></div>
+        </div>
+        <div class="gauge-label">Grip. Power to the wheels. Going further.</div>
+      </div>
+    </div>
+    <div class="reframe-bottom">Tokens are intelligence. Go further, not fewer.</div>
+  </div>
+
+  <!-- SLIDE 3: WHAT TRACTION MEANS -->
+  <div class="slide slide-traction" data-slide="3">
+    <h2 style="margin-bottom: 48px; opacity: 0;" class="traction-h2">Token Traction</h2>
+    <div class="traction-cards">
+      <div class="traction-card">
+        <span class="card-icon">&#9650;</span>
+        <h3>Use MORE</h3>
+        <p>Tokens are work, not waste</p>
+      </div>
+      <div class="traction-card">
+        <span class="card-icon">&#10038;</span>
+        <h3>Maximize GRIP</h3>
+        <p>Every token drives forward</p>
+      </div>
+      <div class="traction-card">
+        <span class="card-icon">&#10230;</span>
+        <h3>Go FURTHER</h3>
+        <p>Bigger ambitions, deeper work</p>
+      </div>
+    </div>
+    <div class="traction-tagline">Remove friction. Not tokens.</div>
+  </div>
+
+  <!-- SLIDE 4: TAKEAWAYS -->
+  <div class="slide slide-takeaways" data-slide="4">
+    <h2>The Playbook</h2>
+    <ul class="takeaways-list">
+      <li><span class="takeaway-num">01</span> Use Opus 4.6 in CLI — it pays for itself</li>
+      <li><span class="takeaway-num">02</span> Session length drives cost more than model choice</li>
+      <li><span class="takeaway-num">03</span> Keep deep sessions warm</li>
+      <li><span class="takeaway-num">04</span> Multi-claude: one deep, rest shallow</li>
+      <li><span class="takeaway-num">05</span> Memory files carry traction across sessions</li>
+    </ul>
+    <div class="takeaway-cta">Let's look at why.</div>
+  </div>
+
+  <!-- SLIDE 5: MAX VS ENTERPRISE -->
+  <div class="slide slide-plans" data-slide="5">
+    <h2>Two Worlds</h2>
+    <div class="plans-container">
+      <div class="plan-panel">
+        <h3>Max Plan <span class="dim">(home)</span></h3>
+        <div class="plan-visual plan-visual-flat">
+          <div class="flat-line"></div>
+          <div class="rate-wall"></div>
+          <div class="wall-label">limit</div>
+        </div>
+        <div class="plan-label">Ceiling, not a bill</div>
+      </div>
+      <div class="plan-panel">
+        <h3>Enterprise / API <span class="dim">(work)</span></h3>
+        <div class="plan-visual plan-visual-rising">
+          <div class="rising-line"></div>
+        </div>
+        <div class="plan-label">Meter, not a wall</div>
+      </div>
+    </div>
+    <div class="plans-bridge">These strategies help you go further on both.</div>
+    <div class="plans-callout">
+      <p><strong>Use Enterprise at work.</strong> Your usage shapes the team's token allocation. We need the signal.</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: HOW CACHING WORKS -->
+  <div class="slide slide-cache" data-slide="6">
+    <h2>How Caching Works</h2>
+    <div class="cache-timeline">
+      <div class="cache-turn">
+        <div class="turn-label">Turn 1</div>
+        <div class="turn-bar-container">
+          <div class="turn-bar-segment seg-write" style="width: 100%;">write to cache</div>
+        </div>
+        <div class="turn-time">cold start</div>
+      </div>
+      <div class="cache-turn">
+        <div class="turn-label">Turn 2 <span style="color: var(--green);">&#9679;</span></div>
+        <div class="turn-bar-container">
+          <div class="turn-bar-segment seg-read" style="width: 70%;">cache read</div>
+          <div class="turn-bar-segment seg-write" style="width: 30%;">new</div>
+        </div>
+        <div class="turn-time">&lt; 5 min</div>
+      </div>
+      <div class="cache-turn">
+        <div class="turn-label">Turn 3 <span style="color: var(--red);">&#9679;</span></div>
+        <div class="turn-bar-container">
+          <div class="turn-bar-segment seg-miss" style="width: 100%;">cache expired — full rewrite</div>
+        </div>
+        <div class="turn-time">&gt; 5 min gap</div>
+      </div>
+    </div>
+    <div class="cache-stat">Cache reads = 10&times; cheaper</div>
+  </div>
+
+  <!-- SLIDE 7: TWO CACHE TIERS -->
+  <div class="slide slide-tiers" data-slide="7">
+    <h2>Two Cache Tiers</h2>
+    <div class="tiers-container">
+      <div class="tier-block tier-base">
+        <div class="tier-pulse"></div>
+        <div class="tier-header">
+          <span class="tier-name">Base Layer</span>
+          <span class="tier-ttl">1-hour TTL</span>
+        </div>
+        <div class="tier-items">System prompt &middot; Tools &middot; CLAUDE.md</div>
+      </div>
+      <div class="tier-block tier-conv">
+        <div class="tier-pulse"></div>
+        <div class="tier-header">
+          <span class="tier-name">Conversation</span>
+          <span class="tier-ttl">5-min TTL</span>
+        </div>
+        <div class="tier-items">Your turns &middot; Responses &middot; Growing context</div>
+      </div>
+    </div>
+    <div class="tiers-insight"><code>/clear</code> kills the conversation. The base layer survives.</div>
+  </div>
+
+  <!-- SLIDE 8: SESSION LENGTH -->
+  <div class="slide slide-session" data-slide="8">
+    <h2>Session Length = Cost</h2>
+    <div class="session-bars">
+      <div class="session-bar-group">
+        <div class="session-bar" style="--bar-height: 30px;">
+          <div class="bar-layer bar-layer-new" style="height: 30px;"></div>
+        </div>
+        <div class="bar-turn-label">T1</div>
+      </div>
+      <div class="session-bar-group">
+        <div class="session-bar" style="--bar-height: 55px;">
+          <div class="bar-layer bar-layer-old" style="height: 25px;"></div>
+          <div class="bar-layer bar-layer-new" style="height: 30px;"></div>
+        </div>
+        <div class="bar-turn-label">T2</div>
+      </div>
+      <div class="session-bar-group">
+        <div class="session-bar" style="--bar-height: 85px;">
+          <div class="bar-layer bar-layer-old" style="height: 55px;"></div>
+          <div class="bar-layer bar-layer-new" style="height: 30px;"></div>
+        </div>
+        <div class="bar-turn-label">T3</div>
+      </div>
+      <div class="session-bar-group">
+        <div class="session-bar" style="--bar-height: 120px;">
+          <div class="bar-layer bar-layer-old" style="height: 90px;"></div>
+          <div class="bar-layer bar-layer-new" style="height: 30px;"></div>
+        </div>
+        <div class="bar-turn-label">T5</div>
+      </div>
+      <div class="session-bar-group">
+        <div class="session-bar" style="--bar-height: 170px;">
+          <div class="bar-layer bar-layer-old" style="height: 140px;"></div>
+          <div class="bar-layer bar-layer-new" style="height: 30px;"></div>
+        </div>
+        <div class="bar-turn-label">T8</div>
+      </div>
+      <div class="session-bar-group">
+        <div class="session-bar" style="--bar-height: 220px;">
+          <div class="bar-layer bar-layer-old" style="height: 190px;"></div>
+          <div class="bar-layer bar-layer-new" style="height: 30px;"></div>
+        </div>
+        <div class="bar-turn-label">T10</div>
+      </div>
+      <div class="session-bar-group">
+        <div class="session-bar" style="--bar-height: 270px;">
+          <div class="bar-layer bar-layer-old" style="height: 240px;"></div>
+          <div class="bar-layer bar-layer-new" style="height: 30px;"></div>
+        </div>
+        <div class="bar-turn-label">T13</div>
+      </div>
+      <div class="session-bar-group">
+        <div class="session-bar" style="--bar-height: 320px;">
+          <div class="bar-layer bar-layer-old" style="height: 290px;"></div>
+          <div class="bar-layer bar-layer-new" style="height: 30px;"></div>
+          <div class="bar-cost-label">$$$$</div>
+        </div>
+        <div class="bar-turn-label">T15</div>
+      </div>
+    </div>
+    <div class="session-insight">Turn 15 re-reads turns 1&ndash;14. <code>That's the cost.</code></div>
+  </div>
+
+  <!-- SLIDE 9: SCREENSHOTS -->
+  <div class="slide slide-screenshots" data-slide="9">
+    <h2>Screenshots: Permanent Weight</h2>
+    <div class="screenshot-demo">
+      <div class="context-stack">
+        <div class="ctx-block ctx-text">Turn 1 — code edit<span>~5k tokens</span></div>
+        <div class="ctx-block ctx-text will-shrink">Turn 2 — response<span>~5k tokens</span></div>
+        <div class="ctx-block ctx-screenshot wont-shrink">&#128247; Screenshot<span>~2,300 tokens</span></div>
+        <div class="ctx-block ctx-text will-shrink">Turn 3 — debugging<span>~5k tokens</span></div>
+        <div class="ctx-block ctx-text will-shrink">Turn 4 — response<span>~5k tokens</span></div>
+        <div class="ctx-block ctx-screenshot wont-shrink">&#128247; Screenshot<span>~2,300 tokens</span></div>
+        <div class="ctx-block ctx-text will-shrink">Turn 5 — iteration<span>~5k tokens</span></div>
+      </div>
+      <div class="screenshot-info">
+        <div class="ss-stat">
+          <div class="num">~2,300</div>
+          <div class="label">tokens per screenshot</div>
+        </div>
+        <div class="ss-stat">
+          <div class="num">~3,700</div>
+          <div class="label">on Opus 4.7</div>
+        </div>
+        <div class="ss-killer">Screenshots never compress.<br>Permanent weight.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: CACHE SWEET SPOT -->
+  <div class="slide slide-sweetspot" data-slide="10">
+    <h2>The Cache Sweet Spot</h2>
+    <div class="warmth-container">
+      <div class="warmth-bar">
+        <span class="warmth-zone zone-green">&#9679; Warm</span>
+        <span class="warmth-zone zone-yellow">&#9679; Cooling</span>
+        <span class="warmth-zone zone-red">&#9679; Cold</span>
+      </div>
+      <div class="warmth-labels">
+        <span class="warmth-label">Steady turns</span>
+        <span class="warmth-label">&gt; 5 min gap</span>
+        <span class="warmth-label">Cold start</span>
+      </div>
+    </div>
+    <div class="sweetspot-insight">Deep session? Keep it moving.</div>
+  </div>
+
+  <!-- SLIDE 11: OPUS VS SONNET -->
+  <div class="slide slide-opus-sonnet" data-slide="11">
+    <h2>Opus vs Sonnet</h2>
+    <div class="model-compare">
+      <div class="model-track track-sonnet">
+        <h3>Sonnet <span class="mono dim" style="font-size: 16px;">1.0&times; per token</span></h3>
+        <div class="turn-dots">
+          <div class="turn-dot dot-productive">1</div>
+          <div class="turn-dot dot-wasted">2</div>
+          <div class="turn-dot dot-fix">3</div>
+          <div class="turn-dot dot-wasted">4</div>
+          <div class="turn-dot dot-fix">5</div>
+          <div class="turn-dot dot-productive">6</div>
+          <div class="turn-dot dot-wasted">7</div>
+          <div class="turn-dot dot-fix">8</div>
+          <div class="turn-dot dot-wasted">9</div>
+          <div class="turn-dot dot-fix">10</div>
+          <div class="turn-dot dot-productive">11</div>
+          <div class="turn-dot dot-productive">12</div>
+        </div>
+        <div class="model-cost-bar">12 turns &mdash; more $$$</div>
+      </div>
+      <div class="model-track track-opus">
+        <h3>Opus <span class="mono dim" style="font-size: 16px;">1.67&times; per token</span></h3>
+        <div class="turn-dots">
+          <div class="turn-dot dot-productive">1</div>
+          <div class="turn-dot dot-productive">2</div>
+          <div class="turn-dot dot-productive">3</div>
+          <div class="turn-dot dot-productive">4</div>
+        </div>
+        <div class="model-cost-bar">4 turns &mdash; less $$$</div>
+      </div>
+    </div>
+    <div class="compare-transition">Let's see this live...</div>
+  </div>
+
+  <!-- SLIDE 12: LIVE IFRAME -->
+  <div class="slide slide-iframe" data-slide="12">
+    <div class="iframe-container">
+      <iframe src="session-cost-comparison.html" loading="lazy"></iframe>
+    </div>
+    <div class="iframe-hint">Drag sliders to explore</div>
+  </div>
+
+  <!-- SLIDE 13: MULTI-CLAUDE -->
+  <div class="slide slide-multi" data-slide="13">
+    <h2>Multi-Claude Strategy</h2>
+    <div class="terminal-layout">
+      <div class="term-pane term-deep">
+        <div class="term-title">&#9679; Deep Session</div>
+        <div class="term-status">context: 142k tokens<br>cache: warm &#10003;</div>
+      </div>
+      <div class="term-pane term-shallow">
+        <div class="term-title">&#9675; Shallow</div>
+        <div class="term-status">12k tokens</div>
+      </div>
+      <div class="term-pane term-shallow">
+        <div class="term-title">&#9675; Shallow</div>
+        <div class="term-status">8k tokens</div>
+      </div>
+    </div>
+    <div class="multi-rules">
+      <div class="multi-rule"><span class="rule-icon" style="color: var(--green);">&#10003;</span> Shallow = cheap misses</div>
+      <div class="multi-rule"><span class="rule-icon" style="color: var(--red);">&#10007;</span> Multiple deep = expensive misses</div>
+      <div class="multi-rule"><span class="rule-icon" style="color: var(--opus);">&#9733;</span> Prioritize the deep session</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 14: COMPACT -->
+  <div class="slide slide-compact" data-slide="14">
+    <h2 style="margin-bottom: 32px;"><span class="mono" style="color: var(--opus);">/compact</span> &mdash; Surgical Reduction</h2>
+    <div class="compact-demo">
+      <div class="compact-stack">
+        <div class="compact-block cb-old">Turn 1 — setup<span class="dim">oldest</span></div>
+        <div class="compact-block cb-old">Turn 2 — exploration<span class="dim">oldest</span></div>
+        <div class="compact-block cb-old">Turn 3 — dead end<span class="dim">oldest</span></div>
+        <div class="compact-block cb-screenshot">&#128247; Screenshot 1<span>2,300 tok</span></div>
+        <div class="compact-block cb-mid">Turn 5 — pivot<span class="dim">mid</span></div>
+        <div class="compact-block cb-mid">Turn 6 — progress<span class="dim">mid</span></div>
+        <div class="compact-block cb-mid">Turn 7 — refine<span class="dim">mid</span></div>
+        <div class="compact-block cb-screenshot">&#128247; Screenshot 2<span>2,300 tok</span></div>
+        <div class="compact-block cb-recent">Turn 9 — current<span style="color: var(--green);">recent</span></div>
+        <div class="compact-block cb-recent">Turn 10 — latest<span style="color: var(--green);">recent</span></div>
+      </div>
+      <div class="compact-labels">
+        <div class="compact-label cl-removed">&#10005; Oldest &mdash; removed</div>
+        <div class="compact-label cl-summarized">&#8600; Middle &mdash; summarized</div>
+        <div class="compact-label cl-preserved">&#10003; Recent &mdash; preserved</div>
+        <div class="compact-label cl-stuck">&#9632; Screenshots &mdash; unchanged</div>
+      </div>
+    </div>
+    <div class="insight" style="text-align: center;">/compact &mdash; keeps direction, sheds weight</div>
+  </div>
+
+  <!-- SLIDE 15: CLEAR NUKE -->
+  <div class="slide slide-nuke" data-slide="15">
+    <h2 style="margin-bottom: 16px;"><span class="mono" style="color: var(--sonnet);">/clear</span> &mdash; &#9762; Nuclear Option</h2>
+    <div class="nuke-scene">
+      <div class="nuke-stack">
+        <div class="nuke-block nb-text"></div>
+        <div class="nuke-block nb-text"></div>
+        <div class="nuke-block nb-text"></div>
+        <div class="nuke-block nb-screenshot"></div>
+        <div class="nuke-block nb-text"></div>
+        <div class="nuke-block nb-text"></div>
+        <div class="nuke-block nb-screenshot"></div>
+        <div class="nuke-block nb-text"></div>
+      </div>
+      <div class="nuke-symbol">&#9762;</div>
+      <div class="nuke-flash"></div>
+      <div class="nuke-shockwave"></div>
+      <div class="nuke-survivor">
+        <div class="survivor-line"></div>
+        <div class="survivor-label">Base layer survives. Everything else: gone.</div>
+      </div>
+      <div class="nuke-bottom">
+        <div class="nuke-guide ng-compact">/compact = still relevant, too long</div>
+        <div class="nuke-guide ng-clear">/clear = new direction</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 16: LONG-TERM MEMORY -->
+  <div class="slide slide-memory" data-slide="16">
+    <h2>Long-Term Memory</h2>
+    <div class="memory-files">
+      <div class="memory-file">
+        <span class="file-icon">&#128203;</span>
+        <div class="file-name">INTENT.md</div>
+        <div class="file-desc">What we're building and why</div>
+      </div>
+      <div class="memory-file">
+        <span class="file-icon">&#9881;</span>
+        <div class="file-name">CLAUDE.md</div>
+        <div class="file-desc">Project rules and patterns</div>
+      </div>
+      <div class="memory-file">
+        <span class="file-icon">&#128218;</span>
+        <div class="file-name">knowledge.md</div>
+        <div class="file-desc">Domain context for Claude</div>
+      </div>
+    </div>
+    <div class="memory-tagline">Traction that survives <code>/clear</code></div>
+  </div>
+
+  <!-- SLIDE 17: CLOSING -->
+  <div class="slide slide-closing" data-slide="17">
+    <div class="closing-glow"></div>
+    <h1>
+      <span>Think bigger.</span>
+      <span>Use more tokens.</span>
+      <span style="background: linear-gradient(135deg, var(--opus), var(--opus47)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Go further.</span>
+    </h1>
+    <div class="closing-recap">
+      <span class="closing-pill">Opus 4.6 in CLI</span>
+      <span class="closing-pill">Session length = cost</span>
+      <span class="closing-pill">Keep sessions warm</span>
+      <span class="closing-pill">One deep, rest shallow</span>
+      <span class="closing-pill">Memory files = traction</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const progress = document.getElementById('progress');
+const counter = document.getElementById('counter');
+let current = 0;
+
+function goTo(n) {
+  if (n < 0 || n >= slides.length || n === current) return;
+
+  const prev = slides[current];
+  const next = slides[n];
+  const dir = n > current ? 1 : -1;
+
+  // Exit current slide
+  prev.classList.remove('active');
+  prev.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  prev.style.transform = dir > 0 ? 'translateX(-60px)' : 'translateX(60px)';
+  prev.style.opacity = '0';
+
+  // Position next slide at entry point (no transition yet)
+  next.style.transition = 'none';
+  next.style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
+  next.style.opacity = '0';
+  next.offsetHeight; // force reflow to lock the starting position
+
+  // Animate next slide in
+  next.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  next.style.transform = 'translateX(0)';
+  next.style.opacity = '1';
+  next.classList.add('active');
+
+  current = n;
+  updateUI();
+  triggerSlideAnimations(next);
+}
+
+function updateUI() {
+  const pct = ((current + 1) / slides.length) * 100;
+  progress.style.width = pct + '%';
+  counter.textContent = (current + 1) + ' / ' + slides.length;
+}
+
+function triggerSlideAnimations(slide) {
+  // Compact slide: trigger compaction after blocks appear
+  if (slide.classList.contains('slide-compact')) {
+    slide.classList.remove('compacting');
+    setTimeout(() => {
+      slide.classList.add('compacting');
+    }, 1800);
+  }
+
+  // Nuke slide: trigger nuke after blocks appear
+  if (slide.classList.contains('slide-nuke')) {
+    slide.classList.remove('nuking');
+    setTimeout(() => {
+      slide.classList.add('nuking');
+    }, 1200);
+  }
+
+  // Traction slide h2
+  if (slide.classList.contains('slide-traction')) {
+    const h2 = slide.querySelector('.traction-h2');
+    if (h2) {
+      h2.style.animation = 'none';
+      h2.offsetHeight;
+      h2.style.animation = 'fadeUp 0.5s ease forwards';
+    }
+  }
+}
+
+// Reset animations when leaving a slide
+function resetSlide(slide) {
+  slide.classList.remove('compacting', 'nuking');
+
+  // Reset all animated children
+  slide.querySelectorAll('[style*="animation"]').forEach(el => {
+    el.style.animation = '';
+  });
+}
+
+// Navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+    e.preventDefault();
+    goTo(current + 1);
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    goTo(current - 1);
+  } else if (e.key >= '1' && e.key <= '9') {
+    const target = parseInt(e.key) - 1;
+    if (target < slides.length) goTo(target);
+  } else if (e.key === '0') {
+    goTo(9); // 0 = slide 10
+  }
+});
+
+// Click to advance (but not on iframe slide)
+document.addEventListener('click', (e) => {
+  if (slides[current].classList.contains('slide-iframe')) return;
+  if (e.target.closest('iframe')) return;
+  goTo(current + 1);
+});
+
+// Init
+updateUI();
+</script>
+</body>
+</html>
