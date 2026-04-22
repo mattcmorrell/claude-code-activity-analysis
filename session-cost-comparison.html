@@ -422,7 +422,7 @@
     <div class="chart-section">
       <div class="chart-card">
         <h2>Text + Screenshots (4K Display)</h2>
-        <p class="subtitle">Visual debugging — every turn includes a screenshot (~2,560 tokens permanent).</p>
+        <p class="subtitle">Visual debugging — every turn includes a 4K screenshot (~2,300 tokens; ~3,733 on Opus 4.7 due to higher res cap).</p>
         <div class="chart-wrap">
           <canvas id="chartScreenshots"></canvas>
         </div>
@@ -440,7 +440,7 @@
       <div class="assumption-item"><span class="label">Base context:</span> 25K tokens (system prompt, tools, CLAUDE.md)</div>
       <div class="assumption-item"><span class="label">Per turn (text):</span> +5K tokens (productive) / +6K (fix-up)</div>
       <div class="assumption-item"><span class="label">Output per turn:</span> ~2,500 tokens (tool calls + reasoning)</div>
-      <div class="assumption-item"><span class="label">Screenshot mode:</span> 1 screenshot per turn (~2,560 tokens, 4K crop, permanent)</div>
+      <div class="assumption-item"><span class="label">Screenshots:</span> 1 per turn, 4K crop — ~2,300 tokens (4.6/Sonnet/Haiku) / ~3,733 tokens (4.7, higher res cap)</div>
       <div class="assumption-item"><span class="label">Haiku penalty:</span> 3× more turns than Sonnet (weaker model, more retries)</div>
       <div class="assumption-item"><span class="label">Opus 4.7 tokenizer:</span> +30% token inflation on text and output (not images)</div>
       <div class="assumption-item key-assumption"><span class="label">Cache model:</span> Turn 1 = cold start (all cache writes). Turn 2+ = cache reads + 2% miss rate</div>
@@ -453,7 +453,7 @@
 
   <div class="toggle-bar">
     <label class="toggle-label">
-      <input type="checkbox" id="showHaiku" checked>
+      <input type="checkbox" id="showHaiku">
       <span class="toggle-switch"></span>
       Show Haiku 4.5
     </label>
@@ -466,11 +466,13 @@ const TASKS = 1;
 const BASE_CONTEXT = 25000;
 const PRODUCTIVE_TURN_GROWTH = 5000;
 const FIXUP_TURN_GROWTH = 6000;
-const SCREENSHOT_TOKENS = 2560;
-
 const CACHE_MISS_RATE = 0.02;
 const OUTPUT_TOKENS = 2500;
 
+// Screenshot tokens vary by model due to different max resize caps.
+// Modeled as a typical 4K Retina crop (~1000×700 logical = 2000×1400 actual pixels).
+// Opus 4.7 cap: ~2576px (no resize needed) → 2000×1400/750 ≈ 3,733 tokens
+// All others cap: ~1568px (resized) → 1568×1098/750 ≈ 2,300 tokens
 const MODEL_CONFIG = {
   opus46: {
     label: 'Opus 4.6',
@@ -479,6 +481,7 @@ const MODEL_CONFIG = {
     cacheReadRate: 0.50 / 1e6,
     outputRate: 25 / 1e6,
     tokenizerMult: 1.0,
+    screenshotTokens: 2300,
     color: '#5b9cf5',
     borderDash: [],
   },
@@ -489,6 +492,7 @@ const MODEL_CONFIG = {
     cacheReadRate: 0.50 / 1e6,
     outputRate: 25 / 1e6,
     tokenizerMult: 1.3,
+    screenshotTokens: 3733,
     color: '#b07df0',
     borderDash: [6, 3],
   },
@@ -499,6 +503,7 @@ const MODEL_CONFIG = {
     cacheReadRate: 0.30 / 1e6,
     outputRate: 15 / 1e6,
     tokenizerMult: 1.0,
+    screenshotTokens: 2300,
     color: '#e8784e',
     borderDash: [],
   },
@@ -509,6 +514,7 @@ const MODEL_CONFIG = {
     cacheReadRate: 0.08 / 1e6,
     outputRate: 4 / 1e6,
     tokenizerMult: 1.0,
+    screenshotTokens: 2300,
     color: '#4ecb8d',
     borderDash: [3, 3],
   },
@@ -536,7 +542,7 @@ function simulate(modelKey, sonnetMult, includeScreenshots, opusTurns) {
 
       const previousContext = context;
       const textGrowth = (isFixup ? FIXUP_TURN_GROWTH : PRODUCTIVE_TURN_GROWTH) * m.tokenizerMult;
-      const imageGrowth = screenshotThisTurn * SCREENSHOT_TOKENS;
+      const imageGrowth = screenshotThisTurn * m.screenshotTokens;
       const newTokens = textGrowth + imageGrowth;
       context += newTokens;
 
@@ -630,16 +636,18 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
       borderColor: 'rgba(255, 255, 255, 0.18)',
       borderWidth: 1.5,
       borderDash: [4, 4],
-      label: {
-        display: true,
-        content: `Opus done — ${opusDoneTurn} turns`,
-        position: 'start',
-        backgroundColor: 'rgba(24, 26, 36, 0.95)',
-        color: '#c8ccd4',
-        font: { family: 'DM Sans', size: 12, weight: 500 },
-        padding: { x: 8, y: 5 },
-        borderRadius: 4,
-      },
+    },
+    opusDoneLabel: {
+      type: 'label',
+      xValue: opusDoneTurn,
+      yValue: 0,
+      yAdjust: 44,
+      content: `Opus done — ${opusDoneTurn} turns`,
+      backgroundColor: 'rgba(24, 26, 36, 0.95)',
+      color: '#c8ccd4',
+      font: { family: 'DM Sans', size: 12, weight: 500 },
+      padding: { x: 8, y: 5 },
+      borderRadius: 4,
     },
   };
 
@@ -692,6 +700,7 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: { bottom: 24 } },
       animation: { duration: 400 },
       interaction: { mode: 'nearest', axis: 'x', intersect: false },
       scales: {
@@ -702,6 +711,7 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
           title: {
             display: true,
             text: 'Turn',
+            align: 'end',
             color: '#9ea3b0',
             font: { family: 'DM Sans', size: 13, weight: 500 },
             padding: { top: 8 },
@@ -801,7 +811,7 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
     <div class="stat-card">
       <div class="model-label opus47">Opus 4.7</div>
       <div class="cost-value">${formatDollars(o47)}</div>
-      <div class="cost-detail">${opusDoneTurn} turns · +30% tokenizer</div>
+      <div class="cost-detail">${opusDoneTurn} turns · +30% tokenizer${includeScreenshots ? ' + hi-res screenshots' : ''}</div>
     </div>
     <div class="stat-card">
       <div class="model-label sonnet">Sonnet 4.6</div>
@@ -828,15 +838,17 @@ function buildChart(canvasId, includeScreenshots, statsId, calloutId, sonnetMult
     }
   } else {
     const sPctVs46 = ((s / o46 - 1) * 100).toFixed(0);
+    const o47PctVs46 = ((o47 / o46 - 1) * 100).toFixed(0);
+    const screenshotNote = includeScreenshots ? ` Opus 4.7 costs ${o47PctVs46}% more than 4.6 — the +30% tokenizer tax compounds with higher-resolution screenshots (~3,733 vs ~2,300 tokens each).` : '';
     if (showHaiku) {
       const hVsO46 = h > o46 ? `costs ${((h / o46 - 1) * 100).toFixed(0)}% more` : `saves ${((1 - h / o46) * 100).toFixed(0)}%`;
       calloutEl.innerHTML = `
-        At ${multLabel}× turns, <strong>Sonnet costs ${sPctVs46}% more than Opus 4.6</strong>. Haiku (3× worse than Sonnet = ${haikuTurns} turns) <strong>${hVsO46} vs Opus 4.6</strong> — cheap tokens vs. massive context growth.
+        At ${multLabel}× turns, <strong>Sonnet costs ${sPctVs46}% more than Opus 4.6</strong>. Haiku (3× worse than Sonnet = ${haikuTurns} turns) <strong>${hVsO46} vs Opus 4.6</strong>.${screenshotNote}
       `;
     } else {
       const sPctVs47 = ((s / o47 - 1) * 100).toFixed(0);
       calloutEl.innerHTML = `
-        At ${multLabel}× turns, <strong>Sonnet costs ${sPctVs46}% more than Opus 4.6</strong> and <strong>${sPctVs47}% more than Opus 4.7</strong> for the same task — despite being the cheapest model per token. Opus finishes in ${opusDoneTurn} turns while Sonnet needs ${sonnetTurns}.
+        At ${multLabel}× turns, <strong>Sonnet costs ${sPctVs46}% more than Opus 4.6</strong> and <strong>${sPctVs47}% more than Opus 4.7</strong> for the same task — despite being the cheapest model per token.${screenshotNote}
       `;
     }
   }
