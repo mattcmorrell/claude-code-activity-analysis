@@ -173,6 +173,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .slide-title .subtitle { opacity: 0; }
 .slide-title.active h1 { animation: scaleIn 0.8s ease forwards; }
 .slide-title.active .subtitle { animation: fadeUp 0.6s ease 0.4s forwards; }
+.token-def { font-family: 'JetBrains Mono', monospace; font-size: 17px; color: var(--text-dim); margin-top: 32px; opacity: 0; text-align: center; line-height: 1.6; }
+.slide-title.active .token-def { animation: fadeUp 0.6s ease 0.9s forwards; }
 .title-glow {
   position: absolute; width: 400px; height: 400px; border-radius: 50%;
   background: radial-gradient(circle, rgba(91,156,245,0.08) 0%, transparent 70%);
@@ -622,8 +624,6 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .slide-opus-sonnet.step-2 .track-sonnet .turn-dot:nth-child(8) { animation-delay: 0.76s; }
 .slide-opus-sonnet.step-2 .track-sonnet .turn-dot:nth-child(9) { animation-delay: 0.84s; }
 .slide-opus-sonnet.step-2 .track-sonnet .turn-dot:nth-child(10) { animation-delay: 0.92s; }
-.slide-opus-sonnet.step-2 .track-sonnet .turn-dot:nth-child(11) { animation-delay: 1.0s; }
-.slide-opus-sonnet.step-2 .track-sonnet .turn-dot:nth-child(12) { animation-delay: 1.08s; }
 /* Step 3: Opus track + dots */
 .slide-opus-sonnet.step-3 .track-opus { animation: fadeUp 0.5s ease forwards; }
 .slide-opus-sonnet.step-3 .track-opus .turn-dot { animation: scaleIn 0.3s ease forwards; }
@@ -631,6 +631,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .slide-opus-sonnet.step-3 .track-opus .turn-dot:nth-child(2) { animation-delay: 0.35s; }
 .slide-opus-sonnet.step-3 .track-opus .turn-dot:nth-child(3) { animation-delay: 0.5s; }
 .slide-opus-sonnet.step-3 .track-opus .turn-dot:nth-child(4) { animation-delay: 0.65s; }
+.slide-opus-sonnet.step-3 .track-opus .turn-dot:nth-child(5) { animation-delay: 0.8s; }
 /* Step 4: transition */
 .slide-opus-sonnet.step-4 .compare-transition { animation: fadeUp 0.5s ease forwards; }
 
@@ -884,6 +885,102 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .slide-closing.step-2 .closing-pill:nth-child(4) { animation: fadeUp 0.4s ease 0.3s forwards; }
 .slide-closing.step-2 .closing-pill:nth-child(5) { animation: fadeUp 0.4s ease 0.4s forwards; }
 .slide-closing.step-2 .closing-pill:nth-child(6) { animation: fadeUp 0.4s ease 0.5s forwards; }
+/* ============================================ */
+/* SLIDE: CACHE MISS TRIGGERS — 2 steps        */
+/* ============================================ */
+
+.cache-miss-cards {
+  display: flex; gap: 40px; max-width: 900px; width: 100%; justify-content: center; margin-top: 32px;
+}
+.cache-miss-card {
+  flex: 1; border-radius: 16px; padding: 36px 28px; text-align: center; opacity: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.cm-model {
+  background: rgba(239,68,68,0.08); border: 2px solid rgba(239,68,68,0.25);
+}
+.cm-effort {
+  background: rgba(245,158,11,0.08); border: 2px solid rgba(245,158,11,0.25);
+}
+.cm-icon { font-size: 40px; line-height: 1; }
+.cm-title { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; }
+.cm-model .cm-title { color: var(--red); }
+.cm-effort .cm-title { color: var(--yellow); }
+.cm-desc { font-size: 16px; color: var(--text-secondary); line-height: 1.5; }
+.cm-effect {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 6px 14px;
+  border-radius: 6px; margin-top: 4px;
+}
+.cm-model .cm-effect { color: var(--red); background: rgba(239,68,68,0.1); }
+.cm-effort .cm-effect { color: var(--yellow); background: rgba(245,158,11,0.1); }
+.cm-insight { font-size: 20px; font-weight: 600; color: var(--text-secondary); opacity: 0; margin-top: 40px; max-width: 700px; text-align: center; }
+
+.slide-cache-miss.active .freddy-mask { animation: scaleIn 0.6s ease forwards; }
+.slide-cache-miss.step-1 .cache-miss-card { animation: fadeUp 0.5s ease forwards; }
+.slide-cache-miss.step-1 .cm-effort { animation-delay: 0.2s; }
+.slide-cache-miss.step-2 .cm-insight { animation: fadeUp 0.5s ease forwards; }
+
+/* ============================================ */
+/* SLIDE: MODEL SELECT — 2 steps               */
+/* ============================================ */
+
+.model-cmd-block { text-align: center; opacity: 0; margin-top: 32px; }
+.model-cmd {
+  font-family: 'JetBrains Mono', monospace; font-size: 40px; font-weight: 700;
+  color: var(--opus); background: rgba(91,156,245,0.08); border: 2px solid rgba(91,156,245,0.2);
+  padding: 24px 48px; border-radius: 16px; display: inline-block;
+}
+.model-cmd-note { font-size: 16px; color: var(--text-secondary); margin-top: 16px; }
+.model-ids {
+  display: flex; gap: 24px; justify-content: center; margin-top: 40px; opacity: 0;
+}
+.model-id-card {
+  background: var(--card); border: 1px solid var(--card-border); border-radius: 12px;
+  padding: 20px 24px; text-align: center; min-width: 180px;
+}
+.model-id-name { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.model-id-code { font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 4px 10px; border-radius: 4px; }
+
+.slide-model-select.step-1 .model-cmd-block { animation: scaleIn 0.5s ease forwards; }
+.slide-model-select.step-2 .model-ids { animation: fadeUp 0.5s ease forwards; }
+
+/* Updated opus-sonnet: tokenizer note + recommendation */
+.tokenizer-note {
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-dim);
+  margin-top: 12px;
+}
+.opus47-text { color: var(--opus47); font-weight: 600; }
+.model-rec {
+  max-width: 700px; width: 100%; opacity: 0;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.model-rec-item {
+  display: flex; align-items: center; gap: 20px; padding: 24px 28px; border-radius: 12px;
+}
+.mr-sonnet { background: rgba(232,120,78,0.06); border: 1px solid rgba(232,120,78,0.2); }
+.mr-opus { background: rgba(91,156,245,0.06); border: 1px solid rgba(91,156,245,0.2); }
+.mr-label { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; min-width: 100px; }
+.mr-sonnet .mr-label { color: var(--sonnet); }
+.mr-opus .mr-label { color: var(--opus); }
+.mr-desc { font-size: 18px; color: var(--text-secondary); }
+
+.price-row {
+  display: flex; gap: 60px; justify-content: center; margin-bottom: 32px;
+}
+.price-item { text-align: center; opacity: 0; }
+.price-item-number {
+  font-family: 'JetBrains Mono', monospace; font-size: 56px; font-weight: 800; line-height: 1;
+}
+.price-item-label { font-size: 16px; color: var(--text-secondary); margin-top: 8px; }
+
+.slide-opus-sonnet.step-1 .price-item { animation: fadeUp 0.5s ease forwards; }
+.slide-opus-sonnet.step-1 .price-item:nth-child(2) { animation-delay: 0.2s; }
+.slide-opus-sonnet.step-2 .model-rec { animation: fadeUp 0.5s ease forwards; }
+.slide-opus-sonnet.step-3 .model-cmd-block { animation: fadeUp 0.5s ease forwards; }
+
+/* Extra closing pills */
+.slide-closing.step-2 .closing-pill:nth-child(7) { animation: fadeUp 0.4s ease 0.6s forwards; }
+.slide-closing.step-2 .closing-pill:nth-child(8) { animation: fadeUp 0.4s ease 0.7s forwards; }
 </style>
 </head>
 <body>
@@ -898,6 +995,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="title-glow"></div>
     <h1>Token Traction</h1>
     <p class="subtitle">How to go further with Claude Code</p>
+    <p class="token-def">A token &asymp; a word. Every message, response, and screenshot is measured in tokens.</p>
   </div>
 
   <!-- SLIDE 2: REFRAME -->
@@ -977,6 +1075,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   <!-- SLIDE 5: HOW CACHING WORKS -->
   <div class="slide slide-cache" data-slide="5" data-steps="8">
     <h2>How Caching Works</h2>
+    <h3 style="color: var(--text-dim); font-weight: 400; font-size: 18px; margin-bottom: 28px; max-width: 700px; text-align: center; line-height: 1.5;">Every turn, Claude re-reads the entire conversation. Caching means it remembers what it already read &mdash; so you only pay full price for the new part.</h3>
     <div class="cache-timeline">
       <div class="cache-turn">
         <div class="turn-label">Turn 1</div>
@@ -1030,11 +1129,11 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
         <div class="tiers-labels">
           <div class="tier-label-group">
             <div class="tier-label-name">Base Layer</div>
-            <div class="tier-label-detail">System prompt &middot; Tools &middot; CLAUDE.md</div>
+            <div class="tier-label-detail">Built-in instructions &middot; Tools &middot; Project rules</div>
           </div>
           <div class="tier-label-group">
             <div class="tier-label-name">Conversation</div>
-            <div class="tier-label-detail">Your turns &middot; Responses &middot; Screenshots</div>
+            <div class="tier-label-detail">Your messages &middot; Claude's responses &middot; Screenshots</div>
           </div>
         </div>
         <div class="tier-ttl-row">
@@ -1072,8 +1171,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
       </div>
     </div>
     <div class="cold-rewrite">
-      <div class="cold-rewrite-stat">Cold = full cache rewrite at 1.25&times; cost</div>
-      <div class="cold-rewrite-desc">Every token in your context gets re-written to cache from scratch</div>
+      <div class="cold-rewrite-stat">Cold = re-reading everything from scratch</div>
+      <div class="cold-rewrite-desc">Stepped away for a meeting? Grabbed coffee? Your cache expired. Claude has to re-read the entire conversation at full price &mdash; like starting over.</div>
     </div>
     <div class="cache-size-compare">
       <div class="cache-size-row">
@@ -1086,12 +1185,52 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
         <div class="cache-size-bar-track"><div class="cache-size-bar-fill" style="width: 100%;"></div></div>
         <div class="cache-size-cost csc-big">~$0.56</div>
       </div>
-      <div class="cache-size-verdict">Small cache? No big deal. Deep session? Keep it warm.</div>
+      <div class="cache-size-verdict">Short conversation? No big deal. Deep session with screenshots? Keep it warm.</div>
     </div>
   </div>
 
-  <!-- SLIDE 7: MULTI-CLAUDE -->
-  <div class="slide slide-multi" data-slide="7" data-steps="3">
+  <!-- SLIDE 7: CACHE MISS TRIGGERS -->
+  <div class="slide slide-cache-miss" data-slide="7" data-steps="2">
+    <div class="freddy-mask" style="margin-bottom: 20px; opacity: 0;">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <!-- Fedora -->
+        <ellipse cx="60" cy="38" rx="50" ry="7" fill="#5a3a2a"/>
+        <path d="M22 38 Q28 12 60 6 Q92 12 98 38 Z" fill="#6b4430"/>
+        <rect x="18" y="34" width="84" height="8" rx="4" fill="#5a3a2a"/>
+        <path d="M30 36 L90 36" stroke="rgba(239,68,68,0.4)" stroke-width="2"/>
+        <!-- Face — warm scarred skin -->
+        <path d="M32 44 Q32 98 60 104 Q88 98 88 44 Z" fill="rgba(180,100,80,0.35)" stroke="rgba(180,100,80,0.3)" stroke-width="1"/>
+        <!-- Scars — diagonal stripes -->
+        <line x1="40" y1="50" x2="70" y2="88" stroke="rgba(239,68,68,0.3)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="50" y1="48" x2="80" y2="84" stroke="rgba(239,68,68,0.25)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="34" y1="60" x2="62" y2="96" stroke="rgba(239,68,68,0.2)" stroke-width="2" stroke-linecap="round"/>
+        <!-- Eyes — menacing but cartoonish -->
+        <ellipse cx="46" cy="62" rx="7" ry="4.5" fill="rgba(239,68,68,0.15)" stroke="rgba(239,68,68,0.5)" stroke-width="1"/>
+        <ellipse cx="74" cy="62" rx="7" ry="4.5" fill="rgba(239,68,68,0.15)" stroke="rgba(239,68,68,0.5)" stroke-width="1"/>
+        <circle cx="46" cy="62" r="2" fill="rgba(239,68,68,0.7)"/>
+        <circle cx="74" cy="62" r="2" fill="rgba(239,68,68,0.7)"/>
+      </svg>
+    </div>
+    <h2>Other Cache Killers</h2>
+    <div class="cache-miss-cards">
+      <div class="cache-miss-card cm-model">
+        <div class="cm-icon">&#8644;</div>
+        <div class="cm-title">Switching Models</div>
+        <div class="cm-desc">Changing model mid-conversation invalidates the entire cache. Like starting over cold.</div>
+        <div class="cm-effect">full cache miss</div>
+      </div>
+      <div class="cache-miss-card cm-effort">
+        <div class="cm-icon">&#9881;</div>
+        <div class="cm-title">Changing Effort</div>
+        <div class="cm-desc">Switching thinking levels mid-session resets caching. Pick your level and stay there.</div>
+        <div class="cm-effect">full cache miss</div>
+      </div>
+    </div>
+    <div class="cm-insight">Set your model and effort level before deep work, not during.</div>
+  </div>
+
+  <!-- SLIDE 8: MULTI-CLAUDE -->
+  <div class="slide slide-multi" data-slide="8" data-steps="3">
     <h2>Multi-Claude Strategy</h2>
     <div class="multi-compare">
       <div class="multi-panel mp-bad">
@@ -1136,8 +1275,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="multi-takeaway">One deep, rest shallow. Keep the deep one warm.</div>
   </div>
 
-  <!-- SLIDE 8: TOOLS TO MANAGE CONVO LENGTH -->
-  <div class="slide slide-session" data-slide="8" data-steps="1">
+  <!-- SLIDE 9: TOOLS TO MANAGE CONVO LENGTH -->
+  <div class="slide slide-session" data-slide="9" data-steps="1">
     <h2>Tools to Manage Convo Length</h2>
     <div class="tools-intro">
       <div class="tool-card tc-compact">
@@ -1151,8 +1290,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     </div>
   </div>
 
-  <!-- SLIDE 9: COMPACT -->
-  <div class="slide slide-compact" data-slide="9" data-steps="3">
+  <!-- SLIDE 10: COMPACT -->
+  <div class="slide slide-compact" data-slide="10" data-steps="3">
     <h2 style="margin-bottom: 32px;"><span class="mono" style="color: var(--opus);">/compact</span> &mdash; Surgical Reduction</h2>
     <div class="compact-demo">
       <div class="compact-stack">
@@ -1178,8 +1317,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="ss-note" style="margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(232,120,78,0.8); text-align: center;">Screenshots don't get compressed &mdash; they survive /compact at full size</div>
   </div>
 
-  <!-- SLIDE 10: CLEAR NUKE -->
-  <div class="slide slide-nuke" data-slide="10" data-steps="2">
+  <!-- SLIDE 11: CLEAR NUKE -->
+  <div class="slide slide-nuke" data-slide="11" data-steps="2">
     <h2 style="margin-bottom: 16px;"><span class="mono" style="color: var(--sonnet);">/clear</span> &mdash; &#9762; Nuclear Option</h2>
     <div class="nuke-scene">
       <div class="nuke-stack">
@@ -1205,8 +1344,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     </div>
   </div>
 
-  <!-- SLIDE 11: CHECKPOINT SKILL -->
-  <div class="slide slide-checkpoint" data-slide="11" data-steps="3">
+  <!-- SLIDE 12: CHECKPOINT SKILL -->
+  <div class="slide slide-checkpoint" data-slide="12" data-steps="3">
     <h2 style="margin-bottom: 24px;"><span class="mono" style="color: var(--green);">/checkpoint</span> &mdash; Save Before You Clear</h2>
     <div class="checkpoint-scene">
       <div class="checkpoint-problem">
@@ -1256,71 +1395,69 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     </div>
   </div>
 
-  <!-- SLIDE 12: OPUS VS SONNET -->
-  <div class="slide slide-opus-sonnet" data-slide="12" data-steps="4">
+  <!-- SLIDE 13: OPUS VS SONNET -->
+  <div class="slide slide-opus-sonnet" data-slide="13" data-steps="3">
     <h2>Opus vs Sonnet</h2>
-    <div class="price-callout">
-      <div class="price-callout-number">1.67&times;</div>
-      <div class="price-callout-label"><span>Opus</span> costs 1.67&times; more per token than <span style="color: var(--sonnet);">Sonnet</span></div>
-    </div>
-    <div class="model-compare">
-      <div class="model-track track-sonnet">
-        <h3>Sonnet</h3>
-        <div class="turn-dots">
-          <div class="turn-dot dot-productive">1</div><div class="turn-dot dot-wasted">2</div>
-          <div class="turn-dot dot-fix">3</div><div class="turn-dot dot-wasted">4</div>
-          <div class="turn-dot dot-fix">5</div><div class="turn-dot dot-productive">6</div>
-          <div class="turn-dot dot-wasted">7</div><div class="turn-dot dot-fix">8</div>
-          <div class="turn-dot dot-wasted">9</div><div class="turn-dot dot-fix">10</div>
-          <div class="turn-dot dot-productive">11</div><div class="turn-dot dot-productive">12</div>
-        </div>
-        <div class="model-summary">12 turns &mdash; more $$$</div>
+    <div class="price-row">
+      <div class="price-item">
+        <div class="price-item-number" style="color: var(--opus);">1.67&times;</div>
+        <div class="price-item-label"><span style="color: var(--opus); font-weight: 600;">Opus 4.6</span> vs Sonnet</div>
       </div>
-      <div class="model-track track-opus">
-        <h3>Opus</h3>
-        <div class="turn-dots">
-          <div class="turn-dot dot-productive">1</div><div class="turn-dot dot-productive">2</div>
-          <div class="turn-dot dot-productive">3</div><div class="turn-dot dot-productive">4</div>
-        </div>
-        <div class="model-summary">4 turns &mdash; less $$$</div>
+      <div class="price-item">
+        <div class="price-item-number" style="color: var(--opus47);">~2&times;</div>
+        <div class="price-item-label"><span class="opus47-text">Opus 4.7</span> vs Sonnet</div>
+        <div class="tokenizer-note">4.7 tokenizer uses 30% more tokens than 4.6</div>
       </div>
     </div>
-    <div class="compare-transition">Let's see this live...</div>
+    <div class="model-rec">
+      <div class="model-rec-item mr-sonnet">
+        <div class="mr-label">Sonnet</div>
+        <div class="mr-desc">Use for everything Sonnet can one-shot</div>
+      </div>
+      <div class="model-rec-item mr-opus">
+        <div class="mr-label">Opus</div>
+        <div class="mr-desc">Use for anything that needs deeper reasoning</div>
+      </div>
+    </div>
+    <div class="model-cmd-block">
+      <div class="model-cmd">/model claude-opus-4-6</div>
+      <div class="model-cmd-note">Type this in Claude Code to switch to Opus 4.6</div>
+    </div>
   </div>
 
-  <!-- SLIDE 13: LIVE IFRAME -->
-  <div class="slide slide-iframe" data-slide="13" data-steps="0">
+  <!-- SLIDE 14: LIVE IFRAME -->
+  <div class="slide slide-iframe" data-slide="14" data-steps="0">
     <div class="iframe-container">
       <iframe src="session-cost-comparison.html" loading="lazy"></iframe>
     </div>
     <div class="iframe-hint">Drag sliders to explore</div>
   </div>
 
-  <!-- SLIDE 14: LONG-TERM MEMORY -->
-  <div class="slide slide-memory" data-slide="14" data-steps="2">
+  <!-- SLIDE 15: LONG-TERM MEMORY -->
+  <div class="slide slide-memory" data-slide="15" data-steps="2">
     <h2>Long-Term Memory</h2>
     <div class="memory-files">
       <div class="memory-file">
         <span class="file-icon">&#128203;</span>
         <div class="file-name">INTENT.md</div>
-        <div class="file-desc">What we're building and why</div>
+        <div class="file-desc">What you're building and why. Survives /clear so the next session picks up where you left off.</div>
       </div>
       <div class="memory-file">
         <span class="file-icon">&#9881;</span>
         <div class="file-name">CLAUDE.md</div>
-        <div class="file-desc">Project rules and patterns</div>
+        <div class="file-desc">Project rules Claude always follows. E.g. &ldquo;use ActionBar not toolbar&rdquo; or &ldquo;never delete migration files.&rdquo;</div>
       </div>
       <div class="memory-file">
         <span class="file-icon">&#128218;</span>
         <div class="file-name">knowledge.md</div>
-        <div class="file-desc">Domain context for Claude</div>
+        <div class="file-desc">Domain context you'd normally explain in a message. Loaded automatically so you don't spend tokens repeating it.</div>
       </div>
     </div>
     <div class="memory-tagline">Traction that survives <code>/clear</code></div>
   </div>
 
-  <!-- SLIDE 15: CLOSING -->
-  <div class="slide slide-closing" data-slide="15" data-steps="2">
+  <!-- SLIDE 16: CLOSING -->
+  <div class="slide slide-closing" data-slide="16" data-steps="2">
     <div class="closing-glow"></div>
     <h1>
       <span>Think bigger.</span>
@@ -1330,9 +1467,11 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="closing-recap">
       <span class="closing-pill">Session length = cost</span>
       <span class="closing-pill">Keep sessions warm</span>
+      <span class="closing-pill">Don't switch models mid-session</span>
       <span class="closing-pill">/checkpoint before /clear</span>
       <span class="closing-pill">One deep, rest shallow</span>
-      <span class="closing-pill">Opus over Sonnet</span>
+      <span class="closing-pill">Sonnet one-shots, Opus deep work</span>
+      <span class="closing-pill">/model claude-opus-4-6</span>
       <span class="closing-pill">Memory files = traction</span>
     </div>
   </div>
