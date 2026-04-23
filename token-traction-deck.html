@@ -639,8 +639,9 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 /* SLIDE 11: LIVE IFRAME — 0 steps               */
 /* ============================================ */
 
+.slide-iframe { padding: 20px 24px; }
 .iframe-container {
-  width: 100%; height: 100%; max-width: 1400px; max-height: calc(100vh - 120px);
+  width: 100%; height: 100%; max-width: 1400px; max-height: calc(100vh - 60px);
   border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); opacity: 0;
 }
 .slide-iframe.active .iframe-container { animation: scaleIn 0.5s ease forwards; }
@@ -1593,6 +1594,17 @@ document.addEventListener('click', (e) => {
 });
 
 updateUI();
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const iframe = document.querySelector('.iframe-container iframe');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.dispatchEvent(new Event('resize'));
+    }
+  }, 150);
+});
 </script>
 </body>
 </html>

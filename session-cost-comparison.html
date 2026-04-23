@@ -1038,6 +1038,12 @@ document.getElementById('showHaiku').addEventListener('change', updateAll);
 
 // Initial render
 updateAll();
+
+let resizeRebuild;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeRebuild);
+  resizeRebuild = setTimeout(updateAll, 200);
+});
 </script>
 
 </body>
