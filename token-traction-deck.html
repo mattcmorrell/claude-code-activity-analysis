@@ -240,10 +240,13 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 
 .takeaways-list { list-style: none; max-width: 800px; width: 100%; }
 .takeaways-list li {
-  font-size: 22px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
   display: flex; align-items: baseline; gap: 16px; opacity: 0;
 }
-.takeaway-num { font-family: 'JetBrains Mono', monospace; font-size: 16px; color: var(--opus); font-weight: 600; min-width: 28px; }
+.takeaway-num { font-family: 'JetBrains Mono', monospace; font-size: 16px; color: var(--opus); font-weight: 600; min-width: 28px; padding-top: 2px; align-self: flex-start; }
+.takeaway-text { display: flex; flex-direction: column; gap: 4px; }
+.takeaway-text .takeaway-title { font-size: 22px; color: var(--text); }
+.takeaway-text .takeaway-sub { font-size: 14px; color: var(--text-dim); font-style: italic; }
 .takeaway-cta { font-size: 18px; color: var(--text-dim); margin-top: 32px; opacity: 0; }
 
 /* Step 1: all items staggered */
@@ -1101,6 +1104,109 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 /* Extra closing pills */
 .slide-closing.step-2 .closing-pill:nth-child(7) { animation: fadeUp 0.4s ease 0.6s forwards; }
 .slide-closing.step-2 .closing-pill:nth-child(8) { animation: fadeUp 0.4s ease 0.7s forwards; }
+.slide-closing.step-2 .closing-pill:nth-child(9) { animation: fadeUp 0.4s ease 0.8s forwards; }
+
+/* ============================================ */
+/* SLIDE: CACHE TIMER — 3 steps               */
+/* ============================================ */
+
+.timer-intro {
+  font-size: 18px; color: var(--text-secondary); max-width: 700px; text-align: center; margin-bottom: 36px;
+}
+.timer-states {
+  display: flex; flex-direction: column; gap: 20px; max-width: 700px; width: 100%;
+}
+.timer-state-row {
+  display: flex; align-items: center; gap: 24px; opacity: 0;
+}
+.timer-pill {
+  font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600;
+  padding: 10px 20px; border-radius: 8px; min-width: 280px;
+  background: #1a1e2a; border: 1px solid #2a2e3a;
+}
+.timer-pill .tp-dot {
+  display: inline-block; margin-right: 8px;
+}
+.tp-safe { color: var(--green); }
+.tp-safe .tp-dot { color: var(--green); }
+.tp-warn { color: var(--yellow); }
+.tp-warn .tp-dot { color: var(--yellow); }
+.tp-expired { color: var(--text-dim); }
+.tp-expired .tp-dot { color: var(--text-dim); }
+.tp-danger { color: var(--red); }
+.tp-danger .tp-dot { color: var(--red); }
+.timer-explain {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.timer-explain-label {
+  font-size: 15px; font-weight: 600; color: var(--text);
+}
+.timer-explain-desc {
+  font-size: 14px; color: var(--text-dim); line-height: 1.5;
+}
+.timer-badge {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px; padding: 3px 10px;
+  border-radius: 4px; display: inline-block; margin-bottom: 4px;
+}
+.tb-safe { background: rgba(34,197,94,0.15); color: var(--green); }
+.tb-caution { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.tb-expired { background: rgba(158,163,176,0.15); color: var(--text-dim); }
+.tb-danger { background: rgba(239,68,68,0.15); color: var(--red); }
+
+.timer-install {
+  max-width: 700px; width: 100%; text-align: center; margin-top: 40px; opacity: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.timer-install-cmd {
+  font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600;
+  color: var(--opus); background: rgba(91,156,245,0.08); border: 2px solid rgba(91,156,245,0.2);
+  padding: 16px 32px; border-radius: 12px; display: inline-block;
+}
+.timer-install-note {
+  font-size: 14px; color: var(--text-dim);
+}
+.timer-bar {
+  display: flex; gap: 0; border-radius: 8px; overflow: hidden; max-width: 500px; width: 100%;
+  margin-top: 16px; opacity: 0;
+}
+.timer-bar-seg {
+  padding: 10px 0; text-align: center; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 600;
+}
+.tbs-cached { background: rgba(34,197,94,0.3); color: var(--green); flex: 3; }
+.tbs-countdown { background: rgba(245,158,11,0.3); color: var(--yellow); flex: 2; }
+.tbs-expired { background: rgba(158,163,176,0.2); color: var(--text-dim); flex: 2; }
+.tbs-danger { background: rgba(239,68,68,0.3); color: var(--red); flex: 1.5; }
+
+.slide-timer.step-1 .timer-state-row:nth-child(1) { animation: fadeUp 0.4s ease forwards; }
+.slide-timer.step-1 .timer-state-row:nth-child(2) { animation: fadeUp 0.4s ease 0.15s forwards; }
+.slide-timer.step-1 .timer-state-row:nth-child(3) { animation: fadeUp 0.4s ease 0.3s forwards; }
+.slide-timer.step-1 .timer-state-row:nth-child(4) { animation: fadeUp 0.4s ease 0.45s forwards; }
+.slide-timer.step-2 .timer-bar { animation: fadeUp 0.4s ease forwards; }
+.slide-timer.step-3 .timer-install { animation: fadeUp 0.5s ease forwards; }
+
+/* ============================================ */
+/* SLIDE: TEAM REPORT IFRAME — 0 steps         */
+/* ============================================ */
+
+.slide-report { padding: 20px 24px; }
+.slide-report.active { pointer-events: auto; }
+.report-header {
+  text-align: center; margin-bottom: 12px;
+}
+.report-header h2 { font-size: 36px; margin-bottom: 8px; }
+.report-header-sub {
+  font-size: 16px; color: var(--text-dim); font-style: italic;
+}
+.report-container {
+  width: 100%; flex: 1; max-width: 900px; max-height: calc(100vh - 140px);
+  border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); opacity: 0;
+}
+.slide-report.active .report-container { animation: scaleIn 0.5s ease forwards; }
+.report-container iframe { width: 100%; height: 100%; border: none; }
+.report-hint { position: absolute; bottom: 56px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-dim); opacity: 0; }
+.slide-report.active .report-hint { animation: fadeIn 0.5s ease 0.5s forwards; }
 </style>
 </head>
 <body>
@@ -1158,9 +1264,9 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   <div class="slide slide-takeaways" data-slide="3" data-steps="2">
     <h2>What we'll cover</h2>
     <ul class="takeaways-list">
-      <li><span class="takeaway-num">01</span> Cache me outside</li>
-      <li><span class="takeaway-num">02</span> A tale of two models</li>
-      <li><span class="takeaway-num">03</span> Curing Claude's amnesia</li>
+      <li><span class="takeaway-num">01</span><span class="takeaway-text"><span class="takeaway-title">Cache me outside</span><span class="takeaway-sub">Save tokens through understanding cache and context</span></span></li>
+      <li><span class="takeaway-num">02</span><span class="takeaway-text"><span class="takeaway-title">A tale of two models</span><span class="takeaway-sub">Opus is actually cheaper than Sonnet</span></span></li>
+      <li><span class="takeaway-num">03</span><span class="takeaway-text"><span class="takeaway-title">Curing Claude's amnesia</span><span class="takeaway-sub">Strategies to manage memory</span></span></li>
     </ul>
     <div class="takeaway-cta"></div>
   </div>
@@ -1413,8 +1519,58 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="cm-insight">Set your model and effort level before deep work, not during.</div>
   </div>
 
+  <!-- SLIDE: CACHE TIMER -->
+  <div class="slide slide-timer" data-slide="9" data-steps="3">
+    <h2>See It In Real Time</h2>
+    <div class="timer-intro">A statusline plugin that shows your cache state as you work</div>
+    <div class="timer-states">
+      <div class="timer-state-row">
+        <div class="timer-pill tp-safe"><span class="tp-dot">&#9679;</span> cached</div>
+        <div class="timer-explain">
+          <span class="timer-badge tb-safe">safe</span>
+          <span class="timer-explain-label">Cache is warm</span>
+          <span class="timer-explain-desc">More than 2 min remaining. Keep going.</span>
+        </div>
+      </div>
+      <div class="timer-state-row">
+        <div class="timer-pill tp-warn"><span class="tp-dot">&#9673;</span> 1m30s</div>
+        <div class="timer-explain">
+          <span class="timer-badge tb-caution">caution</span>
+          <span class="timer-explain-label">Expiring soon</span>
+          <span class="timer-explain-desc">Under 2 min left. Send a prompt or it&rsquo;ll expire.</span>
+        </div>
+      </div>
+      <div class="timer-state-row">
+        <div class="timer-pill tp-expired"><span class="tp-dot">&#9675;</span> expired 5m</div>
+        <div class="timer-explain">
+          <span class="timer-badge tb-expired">expired</span>
+          <span class="timer-explain-label">Cache gone</span>
+          <span class="timer-explain-desc">Next turn rebuilds at full price. Small session? No big deal.</span>
+        </div>
+      </div>
+      <div class="timer-state-row">
+        <div class="timer-pill tp-danger"><span class="tp-dot">&#9762;</span> expired 5m &middot; ~$4.50 rebuild</div>
+        <div class="timer-explain">
+          <span class="timer-badge tb-danger">danger</span>
+          <span class="timer-explain-label">Expensive rebuild</span>
+          <span class="timer-explain-desc">Over 1M cached tokens expired. This rebuild costs real money.</span>
+        </div>
+      </div>
+    </div>
+    <div class="timer-bar">
+      <div class="timer-bar-seg tbs-cached">cached</div>
+      <div class="timer-bar-seg tbs-countdown">countdown</div>
+      <div class="timer-bar-seg tbs-expired">expired</div>
+      <div class="timer-bar-seg tbs-danger">danger</div>
+    </div>
+    <div class="timer-install">
+      <div class="timer-install-cmd">/timer</div>
+      <div class="timer-install-note">Toggle on/off &middot; shows in your status bar &middot; zero config</div>
+    </div>
+  </div>
+
   <!-- SLIDE 8: MULTI-CLAUDE -->
-  <div class="slide slide-multi" data-slide="9" data-steps="4">
+  <div class="slide slide-multi" data-slide="10" data-steps="4">
     <h2>Multi-Claude Strategy</h2>
     <div class="multi-compare">
       <div class="multi-panel mp-bad">
@@ -1480,7 +1636,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 9: TOOLS TO MANAGE CONVO LENGTH -->
-  <div class="slide slide-session" data-slide="10" data-steps="1">
+  <div class="slide slide-session" data-slide="11" data-steps="1">
     <h2>Tools to Manage Convo Length</h2>
     <div class="tools-intro">
       <div class="tool-card tc-compact">
@@ -1495,7 +1651,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 10: COMPACT -->
-  <div class="slide slide-compact" data-slide="11" data-steps="3">
+  <div class="slide slide-compact" data-slide="12" data-steps="3">
     <h2 style="margin-bottom: 32px;"><span class="mono" style="color: var(--opus);">/compact</span> &mdash; Surgical Reduction</h2>
     <div class="compact-demo">
       <div class="compact-stack">
@@ -1522,7 +1678,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 11: CLEAR NUKE -->
-  <div class="slide slide-nuke" data-slide="12" data-steps="2">
+  <div class="slide slide-nuke" data-slide="13" data-steps="2">
     <h2 style="margin-bottom: 8px;"><span class="mono" style="color: var(--sonnet);">/clear</span> &mdash; &#9762; Nuclear Option</h2>
     <div style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #8b8bb8; font-style: italic; margin-bottom: 16px; text-align: center;">Start a new session with empty context; previous session stays on disk (resumable with <span style="color: var(--sonnet);">/resume</span>)</div>
     <div class="nuke-scene">
@@ -1550,7 +1706,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 12: CHECKPOINT SKILL -->
-  <div class="slide slide-checkpoint" data-slide="13" data-steps="3">
+  <div class="slide slide-checkpoint" data-slide="14" data-steps="3">
     <h2 style="margin-bottom: 24px;"><span class="mono" style="color: var(--green);">/checkpoint</span> &mdash; Save Before You Clear</h2>
     <div class="checkpoint-scene">
       <div class="checkpoint-problem">
@@ -1601,7 +1757,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 13: OPUS VS SONNET -->
-  <div class="slide slide-opus-sonnet" data-slide="14" data-steps="3">
+  <div class="slide slide-opus-sonnet" data-slide="15" data-steps="3">
     <h2>Opus vs Sonnet</h2>
     <div class="price-row">
       <div class="price-item">
@@ -1658,15 +1814,27 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 14: LIVE IFRAME -->
-  <div class="slide slide-iframe" data-slide="15" data-steps="0">
+  <div class="slide slide-iframe" data-slide="16" data-steps="0">
     <div class="iframe-container">
       <iframe src="session-cost-comparison.html" loading="lazy"></iframe>
     </div>
     <div class="iframe-hint">Drag sliders to explore</div>
   </div>
 
+  <!-- SLIDE: TEAM REPORT -->
+  <div class="slide slide-report" data-slide="17" data-steps="0">
+    <div class="report-header">
+      <h2>Your Team&rsquo;s Usage Report</h2>
+      <div class="report-header-sub">Real data from the last 30 days &mdash; generated by the cache timer plugin</div>
+    </div>
+    <div class="report-container">
+      <iframe src="team_report.html" loading="lazy"></iframe>
+    </div>
+    <div class="report-hint">Scroll to explore &middot; click &ldquo;See which sessions&rdquo; to drill down</div>
+  </div>
+
   <!-- SLIDE 15: LONG-TERM MEMORY -->
-  <div class="slide slide-memory" data-slide="16" data-steps="2">
+  <div class="slide slide-memory" data-slide="18" data-steps="2">
     <h2>Long-Term Memory</h2>
     <div class="memory-files">
       <div class="memory-file">
@@ -1689,7 +1857,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 16: CLOSING -->
-  <div class="slide slide-closing" data-slide="17" data-steps="2">
+  <div class="slide slide-closing" data-slide="19" data-steps="2">
     <div class="closing-glow"></div>
     <h1>
       <span>Think bigger.</span>
@@ -1705,6 +1873,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
       <span class="closing-pill">Sonnet one-shots, Opus deep work</span>
       <span class="closing-pill">/model claude-opus-4-6</span>
       <span class="closing-pill">Memory files = traction</span>
+      <span class="closing-pill">/timer to stay aware</span>
     </div>
   </div>
 
@@ -1819,6 +1988,7 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('click', (e) => {
   if (slides[current].classList.contains('slide-iframe')) return;
+  if (slides[current].classList.contains('slide-report')) return;
   if (e.target.closest('iframe')) return;
   advance();
   updateUI();
