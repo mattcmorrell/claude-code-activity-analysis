@@ -248,10 +248,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 
 /* Step 1: all items staggered */
 .slide-takeaways.step-1 .takeaways-list li:nth-child(1) { animation: fadeUp 0.5s ease forwards; }
-.slide-takeaways.step-1 .takeaways-list li:nth-child(2) { animation: fadeUp 0.5s ease 0.1s forwards; }
-.slide-takeaways.step-1 .takeaways-list li:nth-child(3) { animation: fadeUp 0.5s ease 0.2s forwards; }
-.slide-takeaways.step-1 .takeaways-list li:nth-child(4) { animation: fadeUp 0.5s ease 0.3s forwards; }
-.slide-takeaways.step-1 .takeaways-list li:nth-child(5) { animation: fadeUp 0.5s ease 0.4s forwards; }
+.slide-takeaways.step-1 .takeaways-list li:nth-child(2) { animation: fadeUp 0.5s ease 0.15s forwards; }
+.slide-takeaways.step-1 .takeaways-list li:nth-child(3) { animation: fadeUp 0.5s ease 0.3s forwards; }
 /* Step 2: cta */
 .slide-takeaways.step-2 .takeaway-cta { animation: fadeUp 0.5s ease forwards; }
 
@@ -328,6 +326,10 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .seg-write { background: linear-gradient(135deg, rgba(91,156,245,0.35), rgba(91,156,245,0.2)); border: 1px solid rgba(91,156,245,0.3); }
 .seg-read { background: linear-gradient(135deg, rgba(34,197,94,0.3), rgba(34,197,94,0.15)); border: 1px solid rgba(34,197,94,0.3); }
 .seg-miss { background: linear-gradient(135deg, rgba(239,68,68,0.3), rgba(239,68,68,0.15)); border: 1px solid rgba(239,68,68,0.3); }
+.seg-rate { font-weight: 700; margin-right: 4px; }
+.seg-read .seg-rate { color: rgba(34,197,94,0.95); }
+.seg-write .seg-rate { color: rgba(147,170,210,0.95); }
+.seg-miss .seg-rate { color: rgba(239,68,68,0.95); }
 .turn-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); min-width: 80px; white-space: nowrap; }
 .cache-stat {
   font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700;
@@ -342,20 +344,6 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .slide-cache.step-5 .cache-turn:nth-child(5) { animation: fadeUp 0.5s ease forwards; }
 /* Step 6: stat */
 .slide-cache.step-6 .cache-stat { animation: scaleIn 0.5s ease forwards; }
-/* Step 7: other turns fade, Turn 5 isolates, zoom hint appears */
-.slide-cache.step-7 .cache-turn:nth-child(1),
-.slide-cache.step-7 .cache-turn:nth-child(2),
-.slide-cache.step-7 .cache-turn:nth-child(3),
-.slide-cache.step-7 .cache-turn:nth-child(4) { opacity: 1; animation: fadeOut 0.5s ease forwards; }
-.slide-cache.step-7 .cache-stat { opacity: 1; animation: fadeOut 0.4s ease forwards; }
-.slide-cache.step-7 .cache-turn:nth-child(5) { transform: translateY(-80px); transition: transform 0.6s ease; }
-.slide-cache.step-7 .tiers-zoom-hint { animation: fadeUp 0.5s 0.4s ease forwards; }
-/* Step 8: tier bars appear below the cached segment */
-.slide-cache.step-8 .tiers-zoom-hint { opacity: 1; animation: fadeOut 0.3s ease forwards; }
-.slide-cache.step-8 .tiers-breakdown { animation: fadeIn 0.3s ease forwards; }
-.slide-cache.step-8 .tier-bar-base { animation: tierSplit 0.4s 0.15s ease forwards; }
-.slide-cache.step-8 .tier-bar-conv { animation: tierSplit 0.4s 0.3s ease forwards; }
-/* Step 9: /clear insight */
 
 /* Tier blocks (inside slide-cache after step 7) */
 .tiers-zoom-hint {
@@ -439,6 +427,62 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   from { opacity: 1; transform: translateY(0); }
   to { opacity: 0; transform: translateY(-15px); pointer-events: none; }
 }
+
+/* ============================================ */
+/* SLIDE 6: THE 5-MINUTE RULE — 4 steps         */
+/* ============================================ */
+
+.ttl-rule-sub {
+  color: var(--text-dim); font-weight: 400; font-size: 18px; margin-bottom: 20px;
+  max-width: 700px; text-align: center; line-height: 1.5;
+}
+.ttl-rule-legend {
+  display: flex; gap: 28px; justify-content: center; margin-bottom: 24px; opacity: 0;
+}
+.ttl-legend-item {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary);
+}
+.ttl-legend-item strong { color: var(--text-primary); }
+.ttl-legend-swatch {
+  width: 16px; height: 16px; border-radius: 4px; display: inline-block;
+}
+.ttl-legend-swatch.seg-read { background: rgba(34,197,94,0.4); border: 1px solid rgba(34,197,94,0.5); }
+.ttl-legend-swatch.seg-write { background: rgba(91,156,245,0.35); border: 1px solid rgba(91,156,245,0.4); }
+.ttl-legend-swatch.seg-miss { background: rgba(239,68,68,0.35); border: 1px solid rgba(239,68,68,0.4); }
+
+.ttl-rule-turns { opacity: 0; }
+.ttl-rule-turns .cache-turn { opacity: 1; }
+.ttl-rule-gap-row { opacity: 0; }
+.cache-turn-miss { opacity: 0; }
+
+.ttl-gap-divider {
+  flex: 1; text-align: center; padding: 8px 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600;
+  color: #ef4444; border-top: 2px dashed rgba(239,68,68,0.3); border-bottom: 2px dashed rgba(239,68,68,0.3);
+}
+.ttl-rule-gap-row {
+  margin: 4px 0;
+}
+
+.ttl-rule-insight {
+  max-width: 700px; width: 100%; margin-top: 32px; text-align: center; opacity: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.ttl-rule-key {
+  font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700;
+  color: #10b981;
+}
+.ttl-rule-explain {
+  font-size: 16px; color: var(--text-secondary); line-height: 1.6; max-width: 600px;
+}
+
+/* Steps */
+.slide-ttl-rule.step-1 .ttl-rule-legend { animation: fadeUp 0.4s ease forwards; }
+.slide-ttl-rule.step-2 .ttl-rule-turns { animation: fadeUp 0.5s ease forwards; }
+.slide-ttl-rule.step-3 .ttl-rule-gap-row,
+.slide-ttl-rule.step-3 .cache-turn-miss { animation: fadeUp 0.5s ease forwards; }
+.slide-ttl-rule.step-4 .ttl-rule-insight { animation: fadeUp 0.5s ease forwards; }
 
 /* ============================================ */
 /* SLIDE 8: SESSION LENGTH — 2 steps             */
@@ -556,10 +600,15 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   height: 100%; border-radius: 7px;
   background: linear-gradient(90deg, rgba(239,68,68,0.5), rgba(239,68,68,0.25));
 }
+.cache-size-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600;
+  color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;
+}
 .cache-size-cost {
   font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600;
-  width: 120px; flex-shrink: 0;
+  width: 80px; flex-shrink: 0;
 }
+.cache-size-shrug { font-size: 24px; flex-shrink: 0; width: 36px; text-align: center; }
 .csc-small { color: var(--text-dim); }
 .csc-big { color: rgba(239,68,68,0.9); }
 .cache-size-verdict {
@@ -1037,15 +1086,13 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 
   <!-- SLIDE 3: TAKEAWAYS -->
   <div class="slide slide-takeaways" data-slide="3" data-steps="2">
-    <h2>The Playbook</h2>
+    <h2>What we'll cover</h2>
     <ul class="takeaways-list">
-      <li><span class="takeaway-num">01</span> Session length drives cost more than model choice</li>
-      <li><span class="takeaway-num">02</span> Keep deep sessions warm</li>
-      <li><span class="takeaway-num">03</span> Multi-claude: one deep, rest shallow</li>
-      <li><span class="takeaway-num">04</span> Use Opus instead of Sonnet</li>
-      <li><span class="takeaway-num">05</span> Memory files carry traction across sessions</li>
+      <li><span class="takeaway-num">01</span> Cache me outside</li>
+      <li><span class="takeaway-num">02</span> A tale of two models</li>
+      <li><span class="takeaway-num">03</span> Curing Claude's amnesia</li>
     </ul>
-    <div class="takeaway-cta">Let's look at why.</div>
+    <div class="takeaway-cta"></div>
   </div>
 
   <!-- SLIDE 4: CACHING -->
@@ -1074,7 +1121,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 5: HOW CACHING WORKS -->
-  <div class="slide slide-cache" data-slide="5" data-steps="8">
+  <div class="slide slide-cache" data-slide="5" data-steps="6">
     <h2>How Caching Works</h2>
     <h3 style="color: var(--text-dim); font-weight: 400; font-size: 18px; margin-bottom: 28px; max-width: 700px; text-align: center; line-height: 1.5;">Every turn, Claude re-reads the entire conversation. Caching means it remembers what it already read &mdash; so you only pay full price for the new part.</h3>
     <div class="cache-timeline">
@@ -1119,6 +1166,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
       </div>
     </div>
     <div class="cache-stat">Cache reads 10&times; cheaper than new tokens</div>
+    <!-- Tiers breakdown and zoom hint moved out -->
+    <!--
     <div class="tiers-zoom-hint">What's in that cached portion?</div>
     <div class="tiers-breakdown">
       <div class="turn-label"></div>
@@ -1154,10 +1203,71 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
       </div>
       <div class="turn-time"></div>
     </div>
+    -->
   </div>
 
-  <!-- SLIDE 6: CACHE STATE -->
-  <div class="slide slide-sweetspot" data-slide="6" data-steps="3">
+  <!-- SLIDE 6: THE 5-MINUTE RULE -->
+  <div class="slide slide-ttl-rule" data-slide="6" data-steps="4">
+    <h2>The 5-Minute Rule</h2>
+    <h3 class="ttl-rule-sub">Cache expires 5 minutes after your last message. Here&rsquo;s what that costs.</h3>
+    <div class="ttl-rule-legend">
+      <div class="ttl-legend-item"><span class="ttl-legend-swatch seg-read"></span> cache read <strong>0.1&times;</strong></div>
+      <div class="ttl-legend-item"><span class="ttl-legend-swatch seg-write"></span> cache write <strong>1.25&times;</strong></div>
+      <div class="ttl-legend-item"><span class="ttl-legend-swatch seg-miss"></span> cache miss <strong>1.25&times;</strong></div>
+    </div>
+    <div class="cache-timeline ttl-rule-turns">
+      <div class="cache-turn">
+        <div class="turn-label">Turn 1</div>
+        <div class="turn-bar-container" style="width: 15%;">
+          <div class="turn-bar-segment seg-write" style="width: 100%;"><span class="seg-rate">1.25&times;</span></div>
+        </div>
+        <div class="turn-time">cold start</div>
+      </div>
+      <div class="cache-turn">
+        <div class="turn-label">Turn 2</div>
+        <div class="turn-bar-container" style="width: 30%;">
+          <div class="turn-bar-segment seg-read" style="width: 50%;"><span class="seg-rate">0.1&times;</span></div>
+          <div class="turn-bar-segment seg-write" style="width: 50%;"><span class="seg-rate">1.25&times;</span></div>
+        </div>
+        <div class="turn-time">&lt; 5 min</div>
+      </div>
+      <div class="cache-turn">
+        <div class="turn-label">Turn 3</div>
+        <div class="turn-bar-container" style="width: 48%;">
+          <div class="turn-bar-segment seg-read" style="width: 65%;"><span class="seg-rate">0.1&times;</span></div>
+          <div class="turn-bar-segment seg-write" style="width: 35%;"><span class="seg-rate">1.25&times;</span></div>
+        </div>
+        <div class="turn-time">&lt; 5 min</div>
+      </div>
+      <div class="cache-turn">
+        <div class="turn-label">Turn 4</div>
+        <div class="turn-bar-container" style="width: 68%;">
+          <div class="turn-bar-segment seg-read" style="width: 75%;"><span class="seg-rate">0.1&times;</span></div>
+          <div class="turn-bar-segment seg-write" style="width: 25%;"><span class="seg-rate">1.25&times;</span></div>
+        </div>
+        <div class="turn-time">&lt; 5 min</div>
+      </div>
+      <div class="cache-turn ttl-rule-gap-row">
+        <div class="turn-label"></div>
+        <div class="ttl-gap-divider">&#9202; 5+ minutes pass &hellip;</div>
+        <div class="turn-time"></div>
+      </div>
+      <div class="cache-turn cache-turn-miss">
+        <div class="turn-label" style="color: #ef4444;">Turn 5</div>
+        <div class="turn-bar-container" style="width: 68%;">
+          <div class="turn-bar-segment seg-miss" style="width: 100%;"><span class="seg-rate">1.25&times;</span> entire convo re-cached</div>
+        </div>
+        <div class="turn-time" style="color: #ef4444;">cache miss</div>
+      </div>
+    </div>
+    <div class="ttl-rule-insight">
+      <div class="ttl-rule-key">Every message resets the 5-minute timer</div>
+      <div class="ttl-rule-explain">Keep the conversation moving and most tokens stay at 0.1&times;. Step away and the entire context gets re-read at 1.25&times;.</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: CACHE STATE -->
+  <div class="slide slide-sweetspot" data-slide="7" data-steps="3">
     <h2>Warm or Cold</h2>
     <div class="cache-state-row">
       <div class="cache-state-block csb-warm">
@@ -1176,22 +1286,25 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
       <div class="cold-rewrite-desc">Stepped away for a meeting? Grabbed coffee? Your cache expired. Claude has to re-read the entire conversation at full price &mdash; like starting over.</div>
     </div>
     <div class="cache-size-compare">
+      <div class="cache-size-title">Cost of a single cache miss</div>
       <div class="cache-size-row">
-        <div class="cache-size-label">10k tokens</div>
+        <div class="cache-size-label">10k<br>tokens</div>
         <div class="cache-size-bar-track"><div class="cache-size-bar-fill" style="width: 8%;"></div></div>
         <div class="cache-size-cost csc-small">~$0.005</div>
+        <div class="cache-size-shrug">&#129335;</div>
       </div>
       <div class="cache-size-row">
-        <div class="cache-size-label">150k tokens</div>
+        <div class="cache-size-label">150k<br>tokens</div>
         <div class="cache-size-bar-track"><div class="cache-size-bar-fill" style="width: 100%;"></div></div>
         <div class="cache-size-cost csc-big">~$0.56</div>
+        <div class="cache-size-shrug" style="color: #ef4444;">&#128561;</div>
       </div>
-      <div class="cache-size-verdict">Short conversation? No big deal. Deep session with screenshots? Keep it warm.</div>
+      <div class="cache-size-verdict">Small session miss? Who cares. Deep session miss? That&rsquo;s real money.</div>
     </div>
   </div>
 
-  <!-- SLIDE 7: CACHE MISS TRIGGERS -->
-  <div class="slide slide-cache-miss" data-slide="7" data-steps="2">
+  <!-- SLIDE 8: CACHE MISS TRIGGERS -->
+  <div class="slide slide-cache-miss" data-slide="8" data-steps="2">
     <div class="freddy-mask" style="margin-bottom: 20px; opacity: 0;">
       <svg width="120" height="120" viewBox="0 0 120 120">
         <!-- Fedora -->
@@ -1231,7 +1344,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 8: MULTI-CLAUDE -->
-  <div class="slide slide-multi" data-slide="8" data-steps="3">
+  <div class="slide slide-multi" data-slide="9" data-steps="3">
     <h2>Multi-Claude Strategy</h2>
     <div class="multi-compare">
       <div class="multi-panel mp-bad">
@@ -1277,7 +1390,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 9: TOOLS TO MANAGE CONVO LENGTH -->
-  <div class="slide slide-session" data-slide="9" data-steps="1">
+  <div class="slide slide-session" data-slide="10" data-steps="1">
     <h2>Tools to Manage Convo Length</h2>
     <div class="tools-intro">
       <div class="tool-card tc-compact">
@@ -1292,7 +1405,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 10: COMPACT -->
-  <div class="slide slide-compact" data-slide="10" data-steps="3">
+  <div class="slide slide-compact" data-slide="11" data-steps="3">
     <h2 style="margin-bottom: 32px;"><span class="mono" style="color: var(--opus);">/compact</span> &mdash; Surgical Reduction</h2>
     <div class="compact-demo">
       <div class="compact-stack">
@@ -1319,7 +1432,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 11: CLEAR NUKE -->
-  <div class="slide slide-nuke" data-slide="11" data-steps="2">
+  <div class="slide slide-nuke" data-slide="12" data-steps="2">
     <h2 style="margin-bottom: 16px;"><span class="mono" style="color: var(--sonnet);">/clear</span> &mdash; &#9762; Nuclear Option</h2>
     <div class="nuke-scene">
       <div class="nuke-stack">
@@ -1346,7 +1459,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 12: CHECKPOINT SKILL -->
-  <div class="slide slide-checkpoint" data-slide="12" data-steps="3">
+  <div class="slide slide-checkpoint" data-slide="13" data-steps="3">
     <h2 style="margin-bottom: 24px;"><span class="mono" style="color: var(--green);">/checkpoint</span> &mdash; Save Before You Clear</h2>
     <div class="checkpoint-scene">
       <div class="checkpoint-problem">
@@ -1397,7 +1510,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 13: OPUS VS SONNET -->
-  <div class="slide slide-opus-sonnet" data-slide="13" data-steps="3">
+  <div class="slide slide-opus-sonnet" data-slide="14" data-steps="3">
     <h2>Opus vs Sonnet</h2>
     <div class="price-row">
       <div class="price-item">
@@ -1427,7 +1540,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 14: LIVE IFRAME -->
-  <div class="slide slide-iframe" data-slide="14" data-steps="0">
+  <div class="slide slide-iframe" data-slide="15" data-steps="0">
     <div class="iframe-container">
       <iframe src="session-cost-comparison.html" loading="lazy"></iframe>
     </div>
@@ -1435,7 +1548,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 15: LONG-TERM MEMORY -->
-  <div class="slide slide-memory" data-slide="15" data-steps="2">
+  <div class="slide slide-memory" data-slide="16" data-steps="2">
     <h2>Long-Term Memory</h2>
     <div class="memory-files">
       <div class="memory-file">
@@ -1458,7 +1571,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 16: CLOSING -->
-  <div class="slide slide-closing" data-slide="16" data-steps="2">
+  <div class="slide slide-closing" data-slide="17" data-steps="2">
     <div class="closing-glow"></div>
     <h1>
       <span>Think bigger.</span>
