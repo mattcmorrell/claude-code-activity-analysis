@@ -756,7 +756,56 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 /* Steps */
 .slide-multi.step-1 .mp-bad { animation: fadeUp 0.5s ease forwards; }
 .slide-multi.step-2 .mp-good { animation: fadeUp 0.5s ease forwards; }
-.slide-multi.step-3 .multi-takeaway { animation: fadeUp 0.4s ease forwards; }
+.slide-multi.step-3 .recache-costs { animation: fadeUp 0.4s ease forwards; }
+.slide-multi.step-4 .multi-takeaway { animation: fadeUp 0.4s ease forwards; }
+.recache-costs {
+  opacity: 0; margin-top: 28px; width: 100%; max-width: 680px;
+}
+.recache-costs table {
+  width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace;
+}
+.recache-costs th {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #999;
+  padding: 6px 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.recache-costs th:first-child { text-align: left; }
+.recache-costs td {
+  padding: 7px 12px; text-align: center; font-size: 14px; color: #ccc;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.recache-costs td:first-child {
+  text-align: left; color: #999; font-size: 13px;
+}
+.recache-costs .rc-sonnet { color: var(--sonnet); }
+.recache-costs .rc-opus { color: var(--opus); }
+.recache-costs .rc-label {
+  font-size: 12px; color: #777; text-align: center; margin-top: 8px; font-style: italic;
+}
+.recache-costs .rc-compaction-row td {
+  border-bottom: none; padding: 0; position: relative; height: 32px;
+}
+.recache-costs .rc-compaction-row td .rc-compaction-line {
+  position: absolute; top: 50%; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--green) 15%, var(--green) 85%, transparent 100%);
+  opacity: 0.7;
+}
+.recache-costs .rc-compaction-row td .rc-compaction-label {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: #1e1e2e; padding: 2px 12px; font-size: 11px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--green); white-space: nowrap;
+}
+.recache-costs .rc-danger td {
+  color: #999; position: relative;
+}
+.recache-costs .rc-danger td:first-child {
+  color: #ef4444;
+}
+.recache-costs .rc-danger .rc-sonnet { color: rgba(239,68,68,0.7); }
+.recache-costs .rc-danger .rc-opus { color: rgba(239,68,68,0.7); }
+.recache-costs .rc-danger-note {
+  font-size: 11px; color: #ef4444; opacity: 0.8; display: block; margin-top: 2px;
+  text-transform: none; letter-spacing: 0;
+}
 
 /* ============================================ */
 /* SLIDE 12: COMPACT — 2 steps                   */
@@ -1024,10 +1073,30 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 }
 .price-item-label { font-size: 16px; color: var(--text-secondary); margin-top: 8px; }
 
+.pricing-cards {
+  display: flex; gap: 16px; justify-content: center; margin-bottom: 28px; opacity: 0;
+}
+.pricing-card {
+  padding: 14px 20px; border-radius: 10px; min-width: 180px; text-align: center;
+}
+.pc-sonnet { background: rgba(232,120,78,0.06); border: 1px solid rgba(232,120,78,0.2); }
+.pc-opus46 { background: rgba(91,156,245,0.06); border: 1px solid rgba(91,156,245,0.2); }
+.pc-opus47 { background: rgba(176,125,240,0.06); border: 1px solid rgba(176,125,240,0.2); }
+.pc-name { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+.pc-sonnet .pc-name { color: var(--sonnet); }
+.pc-opus46 .pc-name { color: var(--opus); }
+.pc-opus47 .pc-name { color: var(--opus47); }
+.pc-rates { display: flex; flex-direction: column; gap: 4px; }
+.pc-rate { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; }
+.pc-label { color: var(--text-dim); }
+.pc-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-secondary); }
+.pc-footnote { font-size: 11px; color: var(--text-dim); margin-top: 8px; font-style: italic; }
+
 .slide-opus-sonnet.step-1 .price-item { animation: fadeUp 0.5s ease forwards; }
 .slide-opus-sonnet.step-1 .price-item:nth-child(2) { animation-delay: 0.2s; }
-.slide-opus-sonnet.step-2 .model-rec { animation: fadeUp 0.5s ease forwards; }
-.slide-opus-sonnet.step-3 .model-cmd-block { animation: fadeUp 0.5s ease forwards; }
+.slide-opus-sonnet.step-2 .pricing-cards { animation: fadeUp 0.5s ease forwards; }
+.slide-opus-sonnet.step-3 .model-rec { animation: fadeUp 0.5s ease forwards; }
+.slide-opus-sonnet.step-3 .model-cmd-block { animation: fadeUp 0.5s ease 0.3s forwards; }
 
 /* Extra closing pills */
 .slide-closing.step-2 .closing-pill:nth-child(7) { animation: fadeUp 0.4s ease 0.6s forwards; }
@@ -1345,7 +1414,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 8: MULTI-CLAUDE -->
-  <div class="slide slide-multi" data-slide="9" data-steps="3">
+  <div class="slide slide-multi" data-slide="9" data-steps="4">
     <h2>Multi-Claude Strategy</h2>
     <div class="multi-compare">
       <div class="multi-panel mp-bad">
@@ -1386,6 +1455,26 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
         </div>
         <div class="mp-cost">1 warm cache + cheap sessions</div>
       </div>
+    </div>
+    <div class="recache-costs">
+      <table>
+        <thead>
+          <tr>
+            <th>Context Size</th>
+            <th>Sonnet Cache Miss</th>
+            <th>Opus Cache Miss</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>50K tokens</td><td class="rc-sonnet">$0.14</td><td class="rc-opus">$0.23</td></tr>
+          <tr><td>100K tokens</td><td class="rc-sonnet">$0.27</td><td class="rc-opus">$0.45</td></tr>
+          <tr><td>150K tokens</td><td class="rc-sonnet">$0.41</td><td class="rc-opus">$0.68</td></tr>
+          <tr><td>200K tokens</td><td class="rc-sonnet">$0.54</td><td class="rc-opus">$0.90</td></tr>
+          <tr class="rc-compaction-row"><td colspan="3"><div class="rc-compaction-line"></div><div class="rc-compaction-label">&#9650; auto compaction fires here (~200K)</div></td></tr>
+          <tr class="rc-danger"><td>500K tokens<span class="rc-danger-note">1M context window</span></td><td class="rc-sonnet">$1.35</td><td class="rc-opus">$2.25</td></tr>
+        </tbody>
+      </table>
+      <div class="rc-label">Cost per turn when cache expires (uncached &minus; cached price)</div>
     </div>
     <div class="multi-takeaway">One deep, rest shallow. Keep the deep one warm.</div>
   </div>
@@ -1434,7 +1523,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 
   <!-- SLIDE 11: CLEAR NUKE -->
   <div class="slide slide-nuke" data-slide="12" data-steps="2">
-    <h2 style="margin-bottom: 16px;"><span class="mono" style="color: var(--sonnet);">/clear</span> &mdash; &#9762; Nuclear Option</h2>
+    <h2 style="margin-bottom: 8px;"><span class="mono" style="color: var(--sonnet);">/clear</span> &mdash; &#9762; Nuclear Option</h2>
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #8b8bb8; font-style: italic; margin-bottom: 16px; text-align: center;">Start a new session with empty context; previous session stays on disk (resumable with <span style="color: var(--sonnet);">/resume</span>)</div>
     <div class="nuke-scene">
       <div class="nuke-stack">
         <div class="nuke-block nb-text"></div>
@@ -1522,6 +1612,33 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
         <div class="price-item-number" style="color: var(--opus47);">~2&times;</div>
         <div class="price-item-label"><span class="opus47-text">Opus 4.7</span> vs Sonnet</div>
         <div class="tokenizer-note">4.7 tokenizer uses 30% more tokens than 4.6</div>
+      </div>
+    </div>
+    <div class="pricing-cards">
+      <div class="pricing-card pc-sonnet">
+        <div class="pc-name">Sonnet 4.6</div>
+        <div class="pc-rates">
+          <div class="pc-rate"><span class="pc-label">Input</span><span class="pc-val">$3</span></div>
+          <div class="pc-rate"><span class="pc-label">Cache read</span><span class="pc-val">$0.30</span></div>
+          <div class="pc-rate"><span class="pc-label">Output</span><span class="pc-val">$15</span></div>
+        </div>
+      </div>
+      <div class="pricing-card pc-opus46">
+        <div class="pc-name">Opus 4.6</div>
+        <div class="pc-rates">
+          <div class="pc-rate"><span class="pc-label">Input</span><span class="pc-val">$5</span></div>
+          <div class="pc-rate"><span class="pc-label">Cache read</span><span class="pc-val">$0.50</span></div>
+          <div class="pc-rate"><span class="pc-label">Output</span><span class="pc-val">$25</span></div>
+        </div>
+      </div>
+      <div class="pricing-card pc-opus47">
+        <div class="pc-name">Opus 4.7</div>
+        <div class="pc-rates">
+          <div class="pc-rate"><span class="pc-label">Input</span><span class="pc-val">$5</span></div>
+          <div class="pc-rate"><span class="pc-label">Cache read</span><span class="pc-val">$0.50</span></div>
+          <div class="pc-rate"><span class="pc-label">Output</span><span class="pc-val">$25</span></div>
+        </div>
+        <div class="pc-footnote">+30% tokenizer inflation</div>
       </div>
     </div>
     <div class="model-rec">
