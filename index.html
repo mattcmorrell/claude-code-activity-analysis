@@ -145,6 +145,90 @@ footer a {
 }
 
 footer a:hover { text-decoration: underline; }
+
+.report-card {
+  flex-direction: column;
+  align-items: stretch;
+  cursor: pointer;
+  padding: 24px 28px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  color: var(--text);
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.report-card:hover {
+  border-color: var(--haiku);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(78, 203, 141, 0.1);
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.report-expand {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, margin-top 0.3s ease;
+  margin-top: 0;
+}
+
+.report-card.expanded .report-expand {
+  max-height: 200px;
+  margin-top: 20px;
+}
+
+.report-cmd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0d1117;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.report-cmd code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--haiku);
+  flex: 1;
+  white-space: nowrap;
+  overflow-x: auto;
+  user-select: all;
+}
+
+.report-cmd .copy-btn {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--card-border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.report-cmd .copy-btn:hover { color: var(--text); border-color: var(--haiku); }
+.report-cmd .copy-btn.copied { color: var(--haiku); border-color: var(--haiku); }
+
+.report-hint {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-top: 12px;
+  line-height: 1.6;
+}
+
+.report-hint strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
 </style>
 </head>
 <body>
@@ -164,16 +248,25 @@ footer a:hover { text-decoration: underline; }
       <span class="badge featured">Start here</span>
     </a>
 
-    <a class="card" href="team_report.html">
-      <div class="card-icon report">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <div class="card report-card" onclick="this.classList.toggle('expanded')">
+      <div class="card-row">
+        <div class="card-icon report">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="card-body">
+          <h2>Run Your Own Report</h2>
+          <p>Analyze your Claude Code usage — cache misses, idle gaps, session costs, and personalized recommendations.</p>
+        </div>
+        <span class="badge">Tool</span>
       </div>
-      <div class="card-body">
-        <h2>Team Report</h2>
-        <p>Detailed breakdown by user, model, and time period with interactive charts.</p>
+      <div class="report-expand" onclick="event.stopPropagation()">
+        <div class="report-cmd">
+          <code id="cmd">curl -fsSLO https://raw.githubusercontent.com/mattcmorrell/claude-code-activity-analysis/main/analyze-cache-cliffs.js</code>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('cmd').textContent.trim()).then(()=>{this.textContent='Copied!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copy';this.classList.remove('copied')},2000)})">Copy</button>
+        </div>
+        <p class="report-hint">Paste in your terminal, then open Claude Code and say:<br><strong>"Run analyze-cache-cliffs.js and analyze my token usage"</strong></p>
       </div>
-      <span class="badge">Report</span>
-    </a>
+    </div>
 
     <a class="card" href="session-cost-comparison.html">
       <div class="card-icon compare">
