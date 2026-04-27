@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token Traction — Claude Code Activity Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --card: #181a24;
+  --card-border: #252836;
+  --text: #e8eaed;
+  --text-secondary: #c8ccd4;
+  --text-dim: #9ea3b0;
+  --opus: #5b9cf5;
+  --opus47: #b07df0;
+  --sonnet: #e8784e;
+  --haiku: #4ecb8d;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.container {
+  max-width: 640px;
+  width: 100%;
+}
+
+h1 {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+h1 span {
+  background: linear-gradient(135deg, var(--opus), var(--opus47));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tagline {
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin-bottom: 48px;
+  line-height: 1.5;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+a.card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 28px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+a.card:hover {
+  border-color: var(--opus);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(91, 156, 245, 0.1);
+}
+
+.card-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.card-icon.deck { background: rgba(91, 156, 245, 0.12); }
+.card-icon.report { background: rgba(78, 203, 141, 0.12); }
+.card-icon.compare { background: rgba(232, 120, 78, 0.12); }
+
+.card-body h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.card-body p {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+.badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(91, 156, 245, 0.1);
+  color: var(--opus);
+}
+
+.badge.featured {
+  background: rgba(176, 125, 240, 0.12);
+  color: var(--opus47);
+}
+
+footer {
+  margin-top: 48px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+footer a {
+  color: var(--opus);
+  text-decoration: none;
+}
+
+footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1><span>Token Traction</span></h1>
+  <p class="tagline">Claude Code activity analysis — what 90 days of real usage looks like in tokens, cost, and team adoption.</p>
+
+  <div class="cards">
+    <a class="card" href="token-traction-deck.html">
+      <div class="card-icon deck">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <div class="card-body">
+        <h2>Slide Deck</h2>
+        <p>The full presentation — 20 slides covering usage patterns, cost analysis, and team recommendations.</p>
+      </div>
+      <span class="badge featured">Start here</span>
+    </a>
+
+    <a class="card" href="team_report.html">
+      <div class="card-icon report">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <div class="card-body">
+        <h2>Team Report</h2>
+        <p>Detailed breakdown by user, model, and time period with interactive charts.</p>
+      </div>
+      <span class="badge">Report</span>
+    </a>
+
+    <a class="card" href="session-cost-comparison.html">
+      <div class="card-icon compare">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <div class="card-body">
+        <h2>Session Cost Comparison</h2>
+        <p>Side-by-side cost analysis across session types and model tiers.</p>
+      </div>
+      <span class="badge">Analysis</span>
+    </a>
+  </div>
+
+  <footer>
+    Built with <a href="https://claude.ai/code">Claude Code</a>
+  </footer>
+</div>
+</body>
+</html>
