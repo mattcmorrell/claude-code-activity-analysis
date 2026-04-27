@@ -456,8 +456,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 
 .ttl-rule-turns { opacity: 0; }
 .ttl-rule-turns .cache-turn { opacity: 1; }
-.ttl-rule-gap-row { opacity: 0; }
-.cache-turn-miss { opacity: 0; }
+.ttl-rule-turns .ttl-rule-gap-row { opacity: 0; }
+.ttl-rule-turns .cache-turn-miss { opacity: 0; }
 
 .ttl-gap-divider {
   flex: 1; text-align: center; padding: 8px 0;
@@ -622,8 +622,6 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .slide-sweetspot.step-1 .cache-state-block { animation: fadeUp 0.5s ease forwards; }
 .slide-sweetspot.step-1 .csb-cold { animation-delay: 0.2s; }
 .slide-sweetspot.step-2 .cold-rewrite { animation: fadeUp 0.5s ease forwards; }
-.slide-sweetspot.step-3 .cache-size-compare { animation: fadeUp 0.5s ease forwards; }
-.slide-sweetspot.step-3 .cache-size-verdict { animation: fadeIn 0.4s ease 0.4s forwards; }
 
 /* ============================================ */
 /* SLIDE 10: OPUS VS SONNET — 3 steps            */
@@ -968,6 +966,12 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 
 .slide-closing h1 { font-size: 56px; text-align: center; line-height: 1.4; opacity: 0; }
 .slide-closing h1 span { display: block; }
+.closing-sub {
+  text-align: center; font-size: 24px; color: var(--text-secondary);
+  line-height: 1.8; margin-top: 8px; opacity: 0;
+}
+.closing-sub span { display: block; }
+.slide-closing.step-1 .closing-sub { animation: fadeUp 0.5s ease 0.4s forwards; }
 .closing-recap { display: flex; flex-wrap: wrap; gap: 12px; max-width: 800px; justify-content: center; margin-top: 48px; }
 .closing-pill {
   font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 8px 16px;
@@ -1069,6 +1073,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 
 .price-row {
   display: flex; gap: 60px; justify-content: center; margin-bottom: 32px;
+  flex-wrap: wrap;
 }
 .price-item { text-align: center; opacity: 0; }
 .price-item-number {
@@ -1078,6 +1083,11 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 
 .pricing-cards {
   display: flex; gap: 16px; justify-content: center; margin-bottom: 28px; opacity: 0;
+  flex-wrap: wrap;
+}
+.pc-asof {
+  width: 100%; text-align: center; font-size: 13px; color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace; margin-top: 4px;
 }
 .pricing-card {
   padding: 14px 20px; border-radius: 10px; min-width: 180px; text-align: center;
@@ -1095,11 +1105,35 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .pc-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-secondary); }
 .pc-footnote { font-size: 11px; color: var(--text-dim); margin-top: 8px; font-style: italic; }
 
-.slide-opus-sonnet.step-1 .price-item { animation: fadeUp 0.5s ease forwards; }
-.slide-opus-sonnet.step-1 .price-item:nth-child(2) { animation-delay: 0.2s; }
-.slide-opus-sonnet.step-2 .pricing-cards { animation: fadeUp 0.5s ease forwards; }
-.slide-opus-sonnet.step-3 .model-rec { animation: fadeUp 0.5s ease forwards; }
-.slide-opus-sonnet.step-3 .model-cmd-block { animation: fadeUp 0.5s ease 0.3s forwards; }
+.slide-opus-sonnet.step-1 .pricing-cards { animation: fadeUp 0.5s ease forwards; }
+.slide-opus-sonnet.step-2 .price-item { animation: fadeUp 0.5s ease forwards; }
+.slide-opus-sonnet.step-2 .price-item:nth-child(2) { animation-delay: 0.2s; }
+.model-cmd-inline {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--opus);
+  margin-top: 12px; padding: 6px 14px; border-radius: 8px; display: inline-block;
+  background: rgba(91,156,245,0.08); border: 1px solid rgba(91,156,245,0.2);
+}
+
+/* Slide 17: When to Use Which */
+.which-callout {
+  opacity: 0; max-width: 700px; width: 100%; text-align: center;
+  padding: 28px 36px; border-radius: 16px;
+  background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25);
+}
+.which-callout-icon { font-size: 40px; margin-bottom: 12px; }
+.which-callout-text {
+  font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 700;
+  color: #10b981; line-height: 1.5;
+}
+.which-callout-text em {
+  font-style: normal; text-decoration: underline; text-underline-offset: 4px;
+  text-decoration-color: rgba(16,185,129,0.5);
+}
+.which-callout-sub {
+  font-size: 16px; color: var(--text-secondary); margin-top: 12px; line-height: 1.5;
+}
+.slide-which-model.step-1 .model-rec { animation: fadeUp 0.5s ease forwards; }
+.slide-which-model.step-2 .which-callout { animation: fadeUp 0.5s ease forwards; }
 
 /* Extra closing pills */
 .slide-closing.step-2 .closing-pill:nth-child(7) { animation: fadeUp 0.4s ease 0.6s forwards; }
@@ -1468,7 +1502,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 7: CACHE STATE -->
-  <div class="slide slide-sweetspot" data-slide="7" data-steps="3">
+  <div class="slide slide-sweetspot" data-slide="7" data-steps="2">
     <h2>Warm or Cold</h2>
     <div class="cache-state-row">
       <div class="cache-state-block csb-warm">
@@ -1485,22 +1519,6 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="cold-rewrite">
       <div class="cold-rewrite-stat">Cold = re-reading everything from scratch</div>
       <div class="cold-rewrite-desc">Stepped away for a meeting? Grabbed coffee? Your cache expired. Claude has to re-read the entire conversation at full price &mdash; like starting over.</div>
-    </div>
-    <div class="cache-size-compare">
-      <div class="cache-size-title">Cost of a single cache miss</div>
-      <div class="cache-size-row">
-        <div class="cache-size-label">10k<br>tokens</div>
-        <div class="cache-size-bar-track"><div class="cache-size-bar-fill" style="width: 8%;"></div></div>
-        <div class="cache-size-cost csc-small">~$0.005</div>
-        <div class="cache-size-shrug">&#129335;</div>
-      </div>
-      <div class="cache-size-row">
-        <div class="cache-size-label">150k<br>tokens</div>
-        <div class="cache-size-bar-track"><div class="cache-size-bar-fill" style="width: 100%;"></div></div>
-        <div class="cache-size-cost csc-big">~$0.56</div>
-        <div class="cache-size-shrug" style="color: #ef4444;">&#128561;</div>
-      </div>
-      <div class="cache-size-verdict">Small session miss? Who cares. Deep session miss? That&rsquo;s real money.</div>
     </div>
   </div>
 
@@ -1793,19 +1811,8 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 13: OPUS VS SONNET -->
-  <div class="slide slide-opus-sonnet" data-slide="16" data-steps="3">
+  <div class="slide slide-opus-sonnet" data-slide="16" data-steps="2">
     <h2>Opus vs Sonnet</h2>
-    <div class="price-row">
-      <div class="price-item">
-        <div class="price-item-number" style="color: var(--opus);">1.67&times;</div>
-        <div class="price-item-label"><span style="color: var(--opus); font-weight: 600;">Opus 4.6</span> vs Sonnet</div>
-      </div>
-      <div class="price-item">
-        <div class="price-item-number" style="color: var(--opus47);">~2&times;</div>
-        <div class="price-item-label"><span class="opus47-text">Opus 4.7</span> vs Sonnet</div>
-        <div class="tokenizer-note">4.7 tokenizer uses 30% more tokens than 4.6</div>
-      </div>
-    </div>
     <div class="pricing-cards">
       <div class="pricing-card pc-sonnet">
         <div class="pc-name">Sonnet 4.6</div>
@@ -1832,7 +1839,25 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
         </div>
         <div class="pc-footnote">+30% tokenizer inflation</div>
       </div>
+      <div class="pc-asof">prices per MTok &middot; since Jan 2025</div>
     </div>
+    <div class="price-row">
+      <div class="price-item">
+        <div class="price-item-number" style="color: var(--opus);">1.67&times;</div>
+        <div class="price-item-label"><span style="color: var(--opus); font-weight: 600;">Opus 4.6</span> vs Sonnet</div>
+        <div class="model-cmd-inline">/model claude-opus-4-6</div>
+      </div>
+      <div class="price-item">
+        <div class="price-item-number" style="color: var(--opus47);">~2&times;</div>
+        <div class="price-item-label"><span class="opus47-text">Opus 4.7</span> vs Sonnet</div>
+        <div class="tokenizer-note">4.7 tokenizer uses 30% more tokens than 4.6</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 17: WHEN TO USE WHICH -->
+  <div class="slide slide-which-model" data-slide="17" data-steps="2">
+    <h2>When to Use Which</h2>
     <div class="model-rec">
       <div class="model-rec-item mr-sonnet">
         <div class="mr-label">Sonnet</div>
@@ -1843,14 +1868,15 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
         <div class="mr-desc">Use for anything that needs deeper reasoning</div>
       </div>
     </div>
-    <div class="model-cmd-block">
-      <div class="model-cmd">/model claude-opus-4-6</div>
-      <div class="model-cmd-note">Type this in Claude Code to switch to Opus 4.6</div>
+    <div class="which-callout">
+      <div class="which-callout-icon">&#9201;</div>
+      <div class="which-callout-text">The <em>minute</em> Sonnet starts to struggle, switch to Opus.</div>
+      <div class="which-callout-sub">If Sonnet takes 2 turns and Opus does it in 1 &mdash; Opus is cheaper.</div>
     </div>
   </div>
 
-  <!-- SLIDE 14: LIVE IFRAME -->
-  <div class="slide slide-iframe" data-slide="17" data-steps="0">
+  <!-- SLIDE 18: LIVE IFRAME -->
+  <div class="slide slide-iframe" data-slide="18" data-steps="0">
     <div class="iframe-container">
       <iframe src="session-cost-comparison.html" loading="lazy"></iframe>
     </div>
@@ -1858,10 +1884,10 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE: TEAM REPORT -->
-  <div class="slide slide-report" data-slide="18" data-steps="0">
+  <div class="slide slide-report" data-slide="19" data-steps="0">
     <div class="report-header">
-      <h2>Your Team&rsquo;s Usage Report</h2>
-      <div class="report-header-sub">Real data from the last 30 days &mdash; generated by the cache timer plugin</div>
+      <h2>Understand Your Token Usage</h2>
+      <div class="report-header-sub">Cache misses, idle gaps, session length, and more</div>
     </div>
     <div class="report-container">
       <iframe src="team_report.html" loading="lazy"></iframe>
@@ -1870,7 +1896,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 15: LONG-TERM MEMORY -->
-  <div class="slide slide-memory" data-slide="19" data-steps="2">
+  <div class="slide slide-memory" data-slide="20" data-steps="2">
     <h2>Long-Term Memory</h2>
     <div class="memory-files">
       <div class="memory-file">
@@ -1893,13 +1919,13 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   </div>
 
   <!-- SLIDE 16: CLOSING -->
-  <div class="slide slide-closing" data-slide="20" data-steps="2">
+  <div class="slide slide-closing" data-slide="21" data-steps="2">
     <div class="closing-glow"></div>
-    <h1>
+    <h1 style="font-size: 72px; background: linear-gradient(135deg, var(--opus), var(--opus47)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Token Traction</h1>
+    <div class="closing-sub">
       <span>Think bigger.</span>
-      <span>Use more tokens.</span>
-      <span style="background: linear-gradient(135deg, var(--opus), var(--opus47)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Go further.</span>
-    </h1>
+      <span>Go further.</span>
+    </div>
     <div class="closing-recap">
       <span class="closing-pill">Session length = cost</span>
       <span class="closing-pill">Keep sessions warm</span>

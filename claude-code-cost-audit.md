@@ -30,19 +30,19 @@ This analysis was inspired by [a Reddit post](https://www.reddit.com/r/ClaudeCod
 
 ## Usage Overview
 
-| Metric | Value |
-|---|---|
-| Sessions | 126 |
-| Turns | 7,298 |
-| Active days | 16 of 16 |
-| Avg turns/session | 58 |
-| Median turns/session | 31 |
-| Sessions with 100+ turns | 20 |
-| Sessions with 500+ turns | 1 |
-| Avg context per turn | 93,973 tokens |
-| Avg cost per turn | $0.045 (4.5¢) |
-| Avg cost per session | $2.59 |
-| Overall cache read ratio | 95.5% |
+| Metric                   | Value         |
+| ------------------------ | ------------- |
+| Sessions                 | 126           |
+| Turns                    | 7,298         |
+| Active days              | 16 of 16      |
+| Avg turns/session        | 58            |
+| Median turns/session     | 31            |
+| Sessions with 100+ turns | 20            |
+| Sessions with 500+ turns | 1             |
+| Avg context per turn     | 93,973 tokens |
+| Avg cost per turn        | $0.045 (4.5¢) |
+| Avg cost per session     | $2.59         |
+| Overall cache read ratio | 95.5%         |
 
 ---
 
@@ -50,52 +50,52 @@ This analysis was inspired by [a Reddit post](https://www.reddit.com/r/ClaudeCod
 
 ### By Category
 
-| Category | Estimated Cost | Share | What It Is |
-|---|---:|---:|---|
-| Cache reads | $174.48 | 53% | Re-sending cached context each turn at discounted rate |
-| Cache creation | $98.67 | 30% | Writing new cache entries when context changes or cache expires |
-| Output | $53.31 | 16% | The actual model responses |
-| Uncached input | $0.09 | <1% | Fresh input not in cache |
-| **Total** | **$326.54** | **100%** | |
+| Category       | Estimated Cost | Share    | What It Is                                                      |
+| -------------- | --------------:| --------:| --------------------------------------------------------------- |
+| Cache reads    | $174.48        | 53%      | Re-sending cached context each turn at discounted rate          |
+| Cache creation | $98.67         | 30%      | Writing new cache entries when context changes or cache expires |
+| Output         | $53.31         | 16%      | The actual model responses                                      |
+| Uncached input | $0.09          | <1%      | Fresh input not in cache                                        |
+| **Total**      | **$326.54**    | **100%** |                                                                 |
 
 The takeaway: **84% of spend is cache tax** — the cost of the stateless request loop where every turn re-sends the full conversation history. Only 16% pays for Claude's actual responses.
 
 ### By Day
 
-| Date | Est. Cost | Turns | Sessions | Cost/Turn |
-|---|---:|---:|---:|---:|
-| Apr 6 | $138.65 | 1,551 | 5 | 8.9¢ |
-| Apr 7 | $4.91 | 130 | 3 | 3.8¢ |
-| Apr 8 | $14.86 | 469 | 2 | 3.2¢ |
-| Apr 9 | $26.42 | 814 | 9 | 3.2¢ |
-| Apr 10 | $14.32 | 496 | 6 | 2.9¢ |
-| Apr 13 | $1.59 | 102 | 3 | 1.6¢ |
-| Apr 15 | $0.68 | 39 | 3 | 1.7¢ |
-| Apr 16 | $4.57 | 152 | 10 | 3.0¢ |
-| Apr 17 | $43.98 | 899 | 15 | 4.9¢ |
-| Apr 20 | $48.45 | 1,558 | 22 | 3.1¢ |
-| Apr 21 | $28.11 | 1,088 | 51 | 2.6¢ |
+| Date   | Est. Cost | Turns | Sessions | Cost/Turn |
+| ------ | ---------:| -----:| --------:| ---------:|
+| Apr 6  | $138.65   | 1,551 | 5        | 8.9¢      |
+| Apr 7  | $4.91     | 130   | 3        | 3.8¢      |
+| Apr 8  | $14.86    | 469   | 2        | 3.2¢      |
+| Apr 9  | $26.42    | 814   | 9        | 3.2¢      |
+| Apr 10 | $14.32    | 496   | 6        | 2.9¢      |
+| Apr 13 | $1.59     | 102   | 3        | 1.6¢      |
+| Apr 15 | $0.68     | 39    | 3        | 1.7¢      |
+| Apr 16 | $4.57     | 152   | 10       | 3.0¢      |
+| Apr 17 | $43.98    | 899   | 15       | 4.9¢      |
+| Apr 20 | $48.45    | 1,558 | 22       | 3.1¢      |
+| Apr 21 | $28.11    | 1,088 | 51       | 2.6¢      |
 
 April 6 alone was 42% of total spend. Cost/turn has trended down from 8.9¢ to 2.6¢ as session patterns shifted from marathon Opus sessions to shorter, mixed-model work.
 
 ### By Project
 
-| Project | Turns | Est. Cost | Share |
-|---|---:|---:|---:|
-| ai-services-poc-1 | 6,719 | $310.78 | 95% |
-| claude-code-activity-analysis | 380 | $11.74 | 4% |
-| All other projects | 199 | $4.02 | 1% |
+| Project                       | Turns | Est. Cost | Share |
+| ----------------------------- | -----:| ---------:| -----:|
+| ai-services-poc-1             | 6,719 | $310.78   | 95%   |
+| claude-code-activity-analysis | 380   | $11.74    | 4%    |
+| All other projects            | 199   | $4.02     | 1%    |
 
 One project accounts for 95% of API-period spend.
 
 ### By Model
 
-| Model | Approx. Cost | Primary Role |
-|---|---:|---|
-| Opus 4.6 | $171.93 | Main workhorse (early period) |
-| Sonnet 4.6 | $109.15 | Increasingly used for routine work |
-| Opus 4.7 | $67.69 | Used from Apr 16+ |
-| Haiku 4.5 | $9.81 | Subagent/light tasks |
+| Model      | Approx. Cost | Primary Role                       |
+| ---------- | ------------:| ---------------------------------- |
+| Opus 4.6   | $171.93      | Main workhorse (early period)      |
+| Sonnet 4.6 | $109.15      | Increasingly used for routine work |
+| Opus 4.7   | $67.69       | Used from Apr 16+                  |
+| Haiku 4.5  | $9.81        | Subagent/light tasks               |
 
 The shift from Opus-only (Apr 6) toward Sonnet+Opus 4.7 mix correlates with the declining cost/turn.
 
@@ -115,24 +115,24 @@ Claude Code is stateless. Every turn, the full conversation — system prompt, t
 
 The JSONL `cache_creation` field breaks down into `ephemeral_5m_input_tokens` and `ephemeral_1h_input_tokens`. Across all sessions:
 
-| Tier | Tokens Created | Share |
-|---|---:|---:|
-| 5-minute TTL | 28,209,768 | 52.8% |
-| 1-hour TTL | 25,250,263 | 47.2% |
+| Tier         | Tokens Created | Share |
+| ------------ | --------------:| -----:|
+| 5-minute TTL | 28,209,768     | 52.8% |
+| 1-hour TTL   | 25,250,263     | 47.2% |
 
 Claude Code uses **two cache tiers simultaneously**. Roughly half the cache is written at 5-minute TTL (likely the dynamic, turn-specific portion — tool outputs, recent messages) and half at 1-hour TTL (likely the stable prefix — system prompt, tool schemas, CLAUDE.md, early conversation).
 
 Empirical verification — average cache read ratio by idle gap before the turn:
 
-| Gap Duration | Turns | Avg Cache % | Verdict |
-|---|---:|---:|---|
-| 0–1 min | 15,146 | 96.3% | Cache alive |
-| 1–5 min | 1,136 | 96.0% | Cache alive |
-| 5–10 min | 175 | 85.2% | 5-min tier expired, 1-hr tier alive |
-| 10–30 min | 85 | 83.0% | Same — partial survival |
-| 30–60 min | 20 | 79.5% | 1-hr tier still mostly alive |
-| 60–90 min | 11 | 12.2% | Both tiers expired |
-| 90+ min | 33 | 14.1% | Both tiers expired |
+| Gap Duration | Turns  | Avg Cache % | Verdict                             |
+| ------------ | ------:| -----------:| ----------------------------------- |
+| 0–1 min      | 15,146 | 96.3%       | Cache alive                         |
+| 1–5 min      | 1,136  | 96.0%       | Cache alive                         |
+| 5–10 min     | 175    | 85.2%       | 5-min tier expired, 1-hr tier alive |
+| 10–30 min    | 85     | 83.0%       | Same — partial survival             |
+| 30–60 min    | 20     | 79.5%       | 1-hr tier still mostly alive        |
+| 60–90 min    | 11     | 12.2%       | Both tiers expired                  |
+| 90+ min      | 33     | 14.1%       | Both tiers expired                  |
 
 **Longest gap with cache survival (>90%): 57.8 minutes.** After ~60 minutes, both tiers expire and the full context is re-created from scratch.
 
@@ -150,14 +150,14 @@ A **cache cliff** is a turn where the cache read ratio drops more than 40 percen
 
 **98 cache cliffs** detected in the API period. Distribution by idle gap before the cliff:
 
-| Gap Before Cliff | Count | Notes |
-|---|---:|---|
-| < 1 minute | 29 | Not idle-related — context changed significantly |
-| 1–5 minutes | 18 | Within cache TTL; likely large tool outputs |
-| 5–15 minutes | 36 | The "coffee break" zone |
-| 15–60 minutes | 9 | Still within 1-hour TTL but context diverged |
-| 1–4 hours | 4 | Cache expired |
-| 4+ hours | 2 | Session resumed after long break |
+| Gap Before Cliff | Count | Notes                                            |
+| ---------------- | -----:| ------------------------------------------------ |
+| < 1 minute       | 29    | Not idle-related — context changed significantly |
+| 1–5 minutes      | 18    | Within cache TTL; likely large tool outputs      |
+| 5–15 minutes     | 36    | The "coffee break" zone                          |
+| 15–60 minutes    | 9     | Still within 1-hour TTL but context diverged     |
+| 1–4 hours        | 4     | Cache expired                                    |
+| 4+ hours         | 2     | Session resumed after long break                 |
 
 The largest category (36 cliffs in the 5–15 min range) suggests that while the 1-hour TTL helps, **context changes from tool outputs and edits** cause more cache invalidation than idle expiry alone. The 29 cliffs under 1 minute confirm this — those are pure context-change cliffs, not timeout cliffs.
 
@@ -167,13 +167,13 @@ Total cache-creation tokens on cliff turns: **8.1M tokens** (~$31 calibrated). T
 
 The top cliffs all occurred in the `ai-services-poc-1` marathon session on April 6:
 
-| Cache Ratio Drop | Context Size | Gap | Turn |
-|---|---:|---|---|
-| 100% → 2% | 513K tokens | 9 min | 836/868 |
-| 100% → 2% | 501K tokens | 11 min | 808/868 |
-| 100% → 2% | 498K tokens | 6 min | 798/868 |
-| 100% → 2% | 491K tokens | 6 min | 781/868 |
-| 100% → 2% | 457K tokens | 14 min | 657/868 |
+| Cache Ratio Drop | Context Size | Gap    | Turn    |
+| ---------------- | ------------:| ------ | ------- |
+| 100% → 2%        | 513K tokens  | 9 min  | 836/868 |
+| 100% → 2%        | 501K tokens  | 11 min | 808/868 |
+| 100% → 2%        | 498K tokens  | 6 min  | 798/868 |
+| 100% → 2%        | 491K tokens  | 6 min  | 781/868 |
+| 100% → 2%        | 457K tokens  | 14 min | 657/868 |
 
 These are 400K–500K token contexts being fully re-created. At those context sizes, a single cache cliff costs ~$2 per occurrence.
 
@@ -181,13 +181,13 @@ These are 400K–500K token contexts being fully re-created. At those context si
 
 ## Most Expensive Sessions
 
-| Session | Project | Turns | Duration | Cache % | Est. Cost |
-|---|---|---:|---:|---:|---:|
-| 0753baf4 | ai-services-poc-1 | 397 | 5.1h | 96% | $80.50 |
-| 93d7f3b8 | ai-services-poc-1 | 453 | 4.2h | 96% | $26.74 |
-| 70d49ae2 | ai-services-poc-1 | 504 | 1.3h | 99% | $26.28 |
-| 99ab8341 | claude-code-activity-analysis | 284 | 5.9h | 95% | $14.52 |
-| d0c00a9f | ai-services-poc-1 | 277 | 2.8h | 94% | $13.57 |
+| Session  | Project                       | Turns | Duration | Cache % | Est. Cost |
+| -------- | ----------------------------- | -----:| --------:| -------:| ---------:|
+| 0753baf4 | ai-services-poc-1             | 397   | 5.1h     | 96%     | $80.50    |
+| 93d7f3b8 | ai-services-poc-1             | 453   | 4.2h     | 96%     | $26.74    |
+| 70d49ae2 | ai-services-poc-1             | 504   | 1.3h     | 99%     | $26.28    |
+| 99ab8341 | claude-code-activity-analysis | 284   | 5.9h     | 95%     | $14.52    |
+| d0c00a9f | ai-services-poc-1             | 277   | 2.8h     | 94%     | $13.57    |
 
 Session `0753baf4` on April 6 is the outlier: $80.50 in a single 5-hour, 397-turn Opus session with 18 cache cliffs. This one session is **25% of the entire month's spend**.
 
@@ -211,17 +211,17 @@ Peak usage is 4pm–10pm MDT (22:00–04:00 UTC), consistent with afternoon/even
 
 A [Reddit analysis](https://www.reddit.com/r/ClaudeCode/) of 858 sessions over 33 days provides a useful comparison point.
 
-| Metric | Reddit Poster | This Audit |
-|---|---|---|
-| Sessions | 858 | 126 |
-| Total turns | 18,903 | 7,298 |
-| Avg turns/session | 22 | 58 |
-| Estimated spend | $1,619 (33 days) | $327 (16 days) |
-| Turns after 5+ min idle | 54% | 2% |
-| Cache cliffs | 232 | 98 |
-| Cache read ratio | Not reported | 95.5% |
-| ENABLE_TOOL_SEARCH | Off (before fix) | On (built into version) |
-| Cache TTL observed | 5 minutes (assumed) | Dual: 53% at 5-min, 47% at 1-hr |
+| Metric                  | Reddit Poster       | This Audit                      |
+| ----------------------- | ------------------- | ------------------------------- |
+| Sessions                | 858                 | 126                             |
+| Total turns             | 18,903              | 7,298                           |
+| Avg turns/session       | 22                  | 58                              |
+| Estimated spend         | $1,619 (33 days)    | $327 (16 days)                  |
+| Turns after 5+ min idle | 54%                 | 2%                              |
+| Cache cliffs            | 232                 | 98                              |
+| Cache read ratio        | Not reported        | 95.5%                           |
+| ENABLE_TOOL_SEARCH      | Off (before fix)    | On (built into version)         |
+| Cache TTL observed      | 5 minutes (assumed) | Dual: 53% at 5-min, 47% at 1-hr |
 
 **Key differences:**
 
@@ -263,6 +263,7 @@ From 8.9¢/turn on April 6 down to 2.6¢/turn on April 21, driven by shorter ses
 **The math:** If every session were capped at 100 turns, cache read cost drops from $200 to $81 — a $118 savings. This is because context grows monotonically within a session. By turn 200, you're paying for 150K+ tokens of cache reads per turn. By turn 400, it's 450K+ per turn. Starting fresh resets to ~25K.
 
 **How to implement:**
+
 - `/clear` and start a new session around turn 100–150, or when context feels heavy
 - Use INTENT.md (already in your workflow) so the new session has full project context without carrying the raw conversation history
 - The memory system auto-injects prior session context on startup, so continuity is preserved
@@ -274,6 +275,7 @@ From 8.9¢/turn on April 6 down to 2.6¢/turn on April 21, driven by shorter ses
 **The math:** If `/compact` reduced context to ~50K tokens every time it crossed 200K, the remaining turns in those sessions would read 50K instead of 200K–500K, saving ~$55.
 
 **How to implement:**
+
 - Run `/compact` before stepping away for any break (lunch, meeting, Slack thread)
 - Run `/compact` when you notice context is large and the current task is winding down
 - `/compact` preserves session state but summarizes older messages, so the context shrinks without losing continuity
@@ -285,6 +287,7 @@ From 8.9¢/turn on April 6 down to 2.6¢/turn on April 21, driven by shorter ses
 **The math:** Sonnet cache reads cost $0.30/MTok vs Opus at $0.50/MTok — 40% cheaper for the same context. Output is $15/MTok vs $25/MTok. On a 100-turn session with 80K average context, that's $2.40 vs $4.00 in cache reads alone.
 
 **How to implement:**
+
 - Default to Sonnet (`/model sonnet`) for file edits, refactoring, test writing, straightforward implementation
 - Switch to Opus (`/model opus`) for architectural decisions, complex debugging, multi-file reasoning
 - Already trending this direction: Apr 21 shows a healthy Sonnet/Opus mix
@@ -298,6 +301,7 @@ From 8.9¢/turn on April 6 down to 2.6¢/turn on April 21, driven by shorter ses
 - **Screenshots**: Playwright screenshots inject large base64 payloads
 
 **How to reduce:**
+
 - Prefer targeted tool calls over broad ones (e.g., `Read` with line ranges instead of full files, `Grep` with `head_limit` instead of unlimited results)
 - Avoid exploratory bash commands that dump large outputs mid-session (pipe to `head`, use `wc -l` to check size first)
 - For Playwright workflows, minimize screenshot frequency — take them at decision points, not every step
@@ -307,6 +311,7 @@ From 8.9¢/turn on April 6 down to 2.6¢/turn on April 21, driven by shorter ses
 **The insight:** Early turns in a session are cheap (25K–50K context). Late turns are expensive (150K–500K context). The same tool call at turn 10 costs 3–10x less in cache reads than at turn 300.
 
 **How to implement:**
+
 - Do the heavy research/exploration at the start of a session when context is small
 - Once you've narrowed down the approach, the implementation turns that follow will carry more context but each individual turn's contribution is smaller
 - If you realize you need a new exploratory phase (different feature, different bug), that's a signal to `/clear` and start fresh rather than explore within a bloated session
@@ -320,35 +325,15 @@ From 8.9¢/turn on April 6 down to 2.6¢/turn on April 21, driven by shorter ses
 
 ### Summary: Expected Impact
 
-| Strategy | Potential Savings | Difficulty |
-|---|---:|---|
-| Cap sessions at 100–150 turns | ~$118/month (59% of cache reads) | Behavioral habit |
-| /compact before breaks | ~$55/month (27% of cache reads) | Easy, one command |
-| Sonnet for routine work | ~$40–60/month | Already trending |
-| Reduce context-change cliffs | ~$15–30/month | Requires awareness |
-| Front-load exploration | Hard to quantify, compounds with above | Planning discipline |
+| Strategy                      | Potential Savings                      | Difficulty          |
+| ----------------------------- | --------------------------------------:| ------------------- |
+| Cap sessions at 100–150 turns | ~$118/month (59% of cache reads)       | Behavioral habit    |
+| /compact before breaks        | ~$55/month (27% of cache reads)        | Easy, one command   |
+| Sonnet for routine work       | ~$40–60/month                          | Already trending    |
+| Reduce context-change cliffs  | ~$15–30/month                          | Requires awareness  |
+| Front-load exploration        | Hard to quantify, compounds with above | Planning discipline |
 
 These strategies compound. Shorter sessions mean smaller contexts, which mean cheaper cliffs, which mean less cache creation. The estimated combined impact is $150–250/month reduction from the current $327 baseline — potentially bringing monthly spend to $150–200 range.
-
----
-
-## Multi-Instance Cost Implications
-
-Running multiple Claude Code instances in parallel has significant cache cost implications due to the dual-tier TTL structure.
-
-**The problem:** Each instance maintains its own independent cache. While you're active in one instance, the others idle. After 5+ minutes, their dynamic cache tier (~53% of context) expires. Switching back triggers a re-creation penalty of ~$0.50–$1.00 per instance per switch, depending on context size.
-
-**Estimated cost of multi-clauding (3 deep sessions, frequent switching):**
-
-| Scenario | Daily Cache Switching Tax |
-|---|---:|
-| 3 instances, stay under 5 min per rotation | ~$0 (fragile — one slow debug breaks it) |
-| 3 instances, realistic 8–10 min rotations | ~$15–$22 |
-| 1 deep instance + subagents for parallel work | ~$0 (subagents share parent cache) |
-
-**Key takeaway:** Subagents are the correct pattern for parallelism — they run inside the parent session's cache, not as separate cached contexts. Multiple deep parallel instances (all 200+ turns) is the worst-case pattern for cache economics. If parallel deep work is needed, prefer sequential focus with `/compact` or `/clear` between switches.
-
-The 1-hour cache tier mitigates this partially — the stable prefix survives across switches, so you pay re-creation on ~half the context rather than all of it. Without the 1-hour tier, multi-instance costs would roughly double.
 
 ---
 
