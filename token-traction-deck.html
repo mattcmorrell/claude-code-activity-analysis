@@ -1317,6 +1317,17 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .report-container iframe { width: 100%; height: 100%; border: none; }
 .report-hint { position: absolute; bottom: 56px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-dim); opacity: 0; }
 .slide-report.active .report-hint { animation: fadeIn 0.5s ease 0.5s forwards; }
+.report-download { text-align: center; margin-bottom: 12px; }
+.report-download .dl-btn {
+  display: inline-block; padding: 10px 28px; border-radius: 8px;
+  background: #58a6ff; color: #0d1117; font-family: 'JetBrains Mono', monospace;
+  font-size: 14px; font-weight: 700; text-decoration: none; transition: all 0.2s;
+}
+.report-download .dl-btn:hover { background: #79bbff; }
+.report-download .dl-hint {
+  margin-top: 6px; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: #999; letter-spacing: 0.02em;
+}
 </style>
 </head>
 <body>
@@ -1964,10 +1975,15 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
       <h2>Understand Your Token Usage</h2>
       <div class="report-header-sub">Cache misses, idle gaps, session length, and more</div>
     </div>
+    <div class="report-download">
+      <a class="dl-btn" href="https://raw.githubusercontent.com/mattcmorrell/claude-code-activity-analysis/main/analyze-cache-cliffs.js" download="analyze-cache-cliffs.js">
+        &#11015;&#65039; Download &amp; Install
+      </a>
+      <div class="dl-hint">Drop into Claude Code &rarr; &ldquo;Run this and analyze my token usage&rdquo;</div>
+    </div>
     <div class="report-container">
       <iframe src="team_report.html" loading="lazy"></iframe>
     </div>
-    <div class="report-hint">Scroll to explore &middot; click &ldquo;See which sessions&rdquo; to drill down</div>
   </div>
 
   <!-- SLIDE 15: LONG-TERM MEMORY -->
