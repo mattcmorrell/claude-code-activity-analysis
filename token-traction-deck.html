@@ -1295,6 +1295,7 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
   color: var(--green); background: rgba(34,197,94,0.1);
   padding: 2px 8px; border-radius: 4px;
 }
+.slide-timer-shot.active { pointer-events: auto; }
 
 /* ============================================ */
 /* SLIDE: TEAM REPORT IFRAME — 0 steps         */
@@ -2158,10 +2159,15 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+document.querySelectorAll('.report-download').forEach(el => {
+  el.addEventListener('click', (e) => e.stopPropagation());
+});
+
 document.addEventListener('click', (e) => {
   if (slides[current].classList.contains('slide-iframe')) return;
   if (slides[current].classList.contains('slide-report')) return;
   if (e.target.closest('iframe')) return;
+  if (e.target.closest('.report-download')) return;
   advance();
   updateUI();
 });
