@@ -65,7 +65,7 @@ h1 span {
   gap: 16px;
 }
 
-a.card {
+a.card, .card {
   display: flex;
   align-items: center;
   gap: 20px;
@@ -82,6 +82,60 @@ a.card:hover {
   border-color: var(--opus);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(91, 156, 245, 0.1);
+}
+
+.tool-section {
+  margin-top: 8px;
+}
+
+.tool-cmd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0d1117;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+
+.tool-cmd code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--haiku);
+  flex: 1;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.tool-cmd .copy-btn {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--card-border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tool-cmd .copy-btn:hover {
+  color: var(--text);
+  border-color: var(--opus);
+}
+
+.tool-cmd .copy-btn.copied {
+  color: var(--haiku);
+  border-color: var(--haiku);
+}
+
+.tool-hint {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  line-height: 1.5;
 }
 
 .card-icon {
@@ -164,16 +218,25 @@ footer a:hover { text-decoration: underline; }
       <span class="badge featured">Start here</span>
     </a>
 
-    <a class="card" href="team_report.html">
-      <div class="card-icon report">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <div class="card" style="flex-direction: column; align-items: stretch;">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="card-icon report">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="card-body">
+          <h2>Run Your Own Report</h2>
+          <p>Analyze your Claude Code token usage — cache misses, idle gaps, session costs, and more.</p>
+        </div>
+        <span class="badge">Tool</span>
       </div>
-      <div class="card-body">
-        <h2>Team Report</h2>
-        <p>Detailed breakdown by user, model, and time period with interactive charts.</p>
+      <div class="tool-section">
+        <div class="tool-cmd">
+          <code id="report-cmd">curl -fsSLO https://raw.githubusercontent.com/mattcmorrell/claude-code-activity-analysis/main/analyze-cache-cliffs.js</code>
+          <button class="copy-btn" onclick="copyCmd(this, 'report-cmd')">Copy</button>
+        </div>
+        <p class="tool-hint">Paste in your terminal, then drop into Claude Code and say "Run this and analyze my token usage."</p>
       </div>
-      <span class="badge">Report</span>
-    </a>
+    </div>
 
     <a class="card" href="session-cost-comparison.html">
       <div class="card-icon compare">
@@ -191,5 +254,18 @@ footer a:hover { text-decoration: underline; }
     Built with <a href="https://claude.ai/code">Claude Code</a>
   </footer>
 </div>
+<script>
+function copyCmd(btn, id) {
+  var text = document.getElementById(id).textContent.trim();
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function() {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
 </body>
 </html>
