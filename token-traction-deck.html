@@ -1298,40 +1298,26 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
 .slide-timer-shot.active { pointer-events: auto; }
 
 /* ============================================ */
-/* SLIDE: TEAM REPORT TOOL — 0 steps            */
+/* SLIDE: TEAM REPORT IFRAME — 0 steps         */
 /* ============================================ */
 
-.slide-report { padding: 40px 80px; }
+.slide-report { padding: 20px 24px; }
 .slide-report.active { pointer-events: auto; }
 .report-header {
-  text-align: center; margin-bottom: 32px;
+  text-align: center; margin-bottom: 12px;
 }
 .report-header h2 { font-size: 36px; margin-bottom: 8px; }
 .report-header-sub {
   font-size: 16px; color: var(--text-dim); font-style: italic;
 }
-.report-features {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 16px; max-width: 700px; margin: 0 auto 32px;
+.report-container {
+  width: 100%; flex: 1; max-width: 900px; max-height: calc(100vh - 140px);
+  border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); opacity: 0;
 }
-.report-feature {
-  background: var(--card); border: 1px solid var(--card-border);
-  border-radius: 10px; padding: 20px 24px;
-  opacity: 0;
-}
-.slide-report.active .report-feature { animation: fadeUp 0.5s ease forwards; }
-.slide-report.active .report-feature:nth-child(2) { animation-delay: 0.1s; }
-.slide-report.active .report-feature:nth-child(3) { animation-delay: 0.2s; }
-.slide-report.active .report-feature:nth-child(4) { animation-delay: 0.3s; }
-.report-feature-icon { font-size: 24px; margin-bottom: 8px; }
-.report-feature h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.report-feature p { font-size: 14px; color: var(--text-dim); line-height: 1.45; }
-.report-step {
-  text-align: center; font-family: 'JetBrains Mono', monospace;
-  font-size: 14px; color: var(--text-dim); margin-bottom: 16px;
-  opacity: 0;
-}
-.slide-report.active .report-step { animation: fadeIn 0.4s ease 0.4s forwards; }
+.slide-report.active .report-container { animation: scaleIn 0.5s ease forwards; }
+.report-container iframe { width: 100%; height: 100%; border: none; }
+.report-hint { position: absolute; bottom: 56px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-dim); opacity: 0; }
+.slide-report.active .report-hint { animation: fadeIn 0.5s ease 0.5s forwards; }
 .report-download { text-align: center; margin-bottom: 16px; }
 .report-download .dl-snippet {
   display: inline-flex; align-items: center; gap: 0;
@@ -2002,41 +1988,21 @@ h3 { font-size: 28px; font-weight: 600; margin-bottom: 24px; color: var(--text-s
     <div class="iframe-hint">Drag sliders to explore</div>
   </div>
 
-  <!-- SLIDE: TEAM REPORT TOOL -->
+  <!-- SLIDE: TEAM REPORT -->
   <div class="slide slide-report" data-slide="20" data-steps="0">
     <div class="report-header">
       <h2>Understand Your Token Usage</h2>
-      <div class="report-header-sub">Run one script to see where your tokens actually go</div>
+      <div class="report-header-sub">Cache misses, idle gaps, session length, and more</div>
     </div>
-    <div class="report-features">
-      <div class="report-feature">
-        <div class="report-feature-icon" style="color: var(--red);">&#9888;</div>
-        <h3>Cache Misses</h3>
-        <p>Find sessions where the cache expired and you paid full price for re-reads.</p>
-      </div>
-      <div class="report-feature">
-        <div class="report-feature-icon" style="color: var(--yellow);">&#9202;</div>
-        <h3>Idle Gaps</h3>
-        <p>Spot 5+ minute pauses that busted the cache and what they cost you.</p>
-      </div>
-      <div class="report-feature">
-        <div class="report-feature-icon" style="color: var(--opus);">&#128200;</div>
-        <h3>Session Sizing</h3>
-        <p>See which conversations ballooned and whether /compact would have helped.</p>
-      </div>
-      <div class="report-feature">
-        <div class="report-feature-icon" style="color: var(--haiku);">&#9989;</div>
-        <h3>Recommendations</h3>
-        <p>Personalized tips based on your actual patterns — not generic advice.</p>
-      </div>
-    </div>
-    <div class="report-step">1. Download the script &nbsp;&rarr;&nbsp; 2. Open Claude Code &nbsp;&rarr;&nbsp; 3. &ldquo;Run this and analyze my usage&rdquo;</div>
     <div class="report-download">
       <div class="dl-snippet">
         <code>curl -fsSLO https://raw.githubusercontent.com/mattcmorrell/claude-code-activity-analysis/main/analyze-cache-cliffs.js</code>
-        <button class="copy-btn" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent.trim());this.innerHTML='&#10003;';this.classList.add('copied');setTimeout(()=>{this.innerHTML='Copy';this.classList.remove('copied')},2000)">Copy</button>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent.trim());this.innerHTML='<svg width=&quot;16&quot; height=&quot;16&quot; viewBox=&quot;0 0 16 16&quot; fill=&quot;currentColor&quot;><path d=&quot;M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z&quot;/></svg>';this.classList.add('copied');setTimeout(()=>{this.innerHTML='<svg width=&quot;16&quot; height=&quot;16&quot; viewBox=&quot;0 0 16 16&quot; fill=&quot;currentColor&quot;><path d=&quot;M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25z&quot;/><path d=&quot;M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25z&quot;/></svg>';this.classList.remove('copied')},2000)"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25z"/></svg></button>
       </div>
-      <div class="dl-hint">Paste in your terminal &rarr; then hand it to Claude Code</div>
+      <div class="dl-hint">Drop into Claude Code &rarr; &ldquo;Run this and analyze my token usage&rdquo;</div>
+    </div>
+    <div class="report-container">
+      <iframe src="team_report.html" loading="lazy"></iframe>
     </div>
   </div>
 
