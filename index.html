@@ -294,10 +294,10 @@ footer a:hover { text-decoration: underline; }
       </div>
       <div class="tool-expand" onclick="event.stopPropagation()">
         <div class="tool-cmd">
-          <code id="cmd-report">curl -fsSLO https://raw.githubusercontent.com/mattcmorrell/claude-code-activity-analysis/main/analyze-cache-cliffs.js</code>
+          <code id="cmd-report">curl -fsSLO https://raw.githubusercontent.com/mattcmorrell/claude-code-activity-analysis/main/generate-report.js && node generate-report.js && open team_report.html</code>
           <button class="copy-btn" onclick="copyCmd(this,'cmd-report')">Copy</button>
         </div>
-        <p class="tool-hint">Paste this script into Claude Code</p>
+        <p class="tool-hint">Paste in your terminal — generates a personalized usage report from your local data.</p>
       </div>
     </div>
 
