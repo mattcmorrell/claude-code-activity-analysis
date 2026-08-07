@@ -1,0 +1,9 @@
+{
+  "name": "claude-code-activity-analysis",
+  "version": "1.0.0",
+  "description": "Analyze your Claude Code usage — cost, cache efficiency, idle gaps",
+  "bin": {
+    "claude-usage-report": "generate-report.js"
+  },
+  "license": "MIT"
+}

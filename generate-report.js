@@ -19,7 +19,8 @@ const IDLE_THRESHOLD_SEC = 300;  // 5 minutes
 const MISS_WRITE_RATIO   = 0.5;
 
 const PROJECTS_DIR = path.join(os.homedir(), '.claude', 'projects');
-const OUTPUT_FILE  = path.join(__dirname, 'team_report.html');
+const OUTPUT_DIR   = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
+const OUTPUT_FILE  = path.join(OUTPUT_DIR, 'team_report.html');
 
 const RANGES = [
   { key: '7d',  label: 'Last 7 days',  days: 7 },
@@ -1247,7 +1248,6 @@ function main() {
     process.exit(1);
   }
 
-  // Compute date ranges
   const now = new Date();
   const rangeData = {};
   for (const r of RANGES) {
@@ -1255,7 +1255,6 @@ function main() {
     rangeData[r.key] = computeRange(sessions, cutoff);
   }
 
-  // Find overall date range
   let minDate = Infinity, maxDate = -Infinity;
   for (const sess of sessions) {
     for (const t of sess.turns) {
@@ -1266,17 +1265,19 @@ function main() {
   const firstDate = fmtDate(new Date(minDate));
   const lastDate = fmtDate(new Date(maxDate));
 
-  // Generate HTML
   const html = generateHtml(rangeData);
   fs.writeFileSync(OUTPUT_FILE, html, 'utf-8');
 
-  // Summary
   const allData = rangeData['all']._summary;
   console.log('');
-  console.log('Report generated: team_report.html');
+  console.log(`Report generated: ${OUTPUT_FILE}`);
   console.log(`  Date range: ${firstDate} to ${lastDate}`);
   console.log(`  Total sessions: ${sessions.length}`);
   console.log(`  Total spend: $${allData.totalSpend}`);
+
+  const opener = process.platform === 'darwin' ? 'open'
+    : process.platform === 'win32' ? 'start' : 'xdg-open';
+  require('child_process').exec(`${opener} "${OUTPUT_FILE}"`);
 }
 
 main();
