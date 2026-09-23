@@ -519,7 +519,7 @@ After your analysis, end your reply with a line containing only RESULT: followed
 
 async function attachRecommendations(rangeData) {
   const useClaude = !process.argv.includes('--no-claude');
-  if (useClaude) console.log('Asking Claude to read your report and write recommendations (takes a minute or two, skip with --no-claude)...');
+  if (useClaude) console.log('\nClaude is reading your report and writing up what it found.\nThis takes about 30-60 seconds — hang tight, the report opens when it\'s done.\n');
   await Promise.all(RANGES.map(async r => {
     const data = rangeData[r.key];
     if (useClaude) {
