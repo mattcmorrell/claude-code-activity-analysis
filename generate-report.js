@@ -8,14 +8,14 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-// ── Pricing (Opus 4.6) ──────────────────────────────────────────────────
+// ── Pricing (Opus 4.6, 1-hour cache TTL) ────────────────────────────────
 const PRICE_CACHE_READ  = 0.50 / 1e6;
-const PRICE_CACHE_WRITE = 6.25 / 1e6;
+const PRICE_CACHE_WRITE = 10.00 / 1e6;  // 1-hour TTL write = 2x base input rate
 const PRICE_FRESH_INPUT = 5.00 / 1e6;
 const PRICE_OUTPUT      = 25.00 / 1e6;
 
 // ── Constants ────────────────────────────────────────────────────────────
-const IDLE_THRESHOLD_SEC = 300;  // 5 minutes
+const IDLE_THRESHOLD_SEC = 3600;  // 1 hour — matches CLAUDE_CODE_USE_EXTENDED_CACHE_TTL
 const MISS_WRITE_RATIO   = 0.5;
 
 const PROJECTS_DIR = path.join(os.homedir(), '.claude', 'projects');
@@ -268,7 +268,7 @@ function computeRange(sessions, cutoffDate) {
     for (const t of sess.turns) {
       if (!isCliff(t)) continue;
       const d = new Date(t.ts);
-      const bucket = t.gapSec >= 3600 ? '>1h' : '5-60m';
+      const bucket = t.gapSec >= 4 * 3600 ? '>4h' : '1-4h';
       idleGaps.push({
         date: fmtDateShort(d),
         time: `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`,
@@ -325,21 +325,21 @@ function computeRange(sessions, cutoffDate) {
   const missCostPct = totalSpend > 0 ? (totalMissCost / totalSpend * 100) : 0;
 
   // Gap buckets summary
-  const gapBucket5to60 = idleGaps.filter(g => g.bucket === '5-60m');
-  const gapBucket1h = idleGaps.filter(g => g.bucket === '>1h');
+  const gapBucket1to4 = idleGaps.filter(g => g.bucket === '1-4h');
+  const gapBucket4plus = idleGaps.filter(g => g.bucket === '>4h');
   const gapBucketsSummary = [];
-  if (gapBucket5to60.length > 0) {
+  if (gapBucket1to4.length > 0) {
     gapBucketsSummary.push({
-      label: '5-60m',
-      count: gapBucket5to60.length,
-      cost: gapBucket5to60.reduce((s, g) => s + g.cost, 0),
+      label: '1-4h',
+      count: gapBucket1to4.length,
+      cost: gapBucket1to4.reduce((s, g) => s + g.cost, 0),
     });
   }
-  if (gapBucket1h.length > 0) {
+  if (gapBucket4plus.length > 0) {
     gapBucketsSummary.push({
-      label: '>1h',
-      count: gapBucket1h.length,
-      cost: gapBucket1h.reduce((s, g) => s + g.cost, 0),
+      label: '>4h',
+      count: gapBucket4plus.length,
+      cost: gapBucket4plus.reduce((s, g) => s + g.cost, 0),
     });
   }
 
@@ -429,12 +429,12 @@ function generateRangePanel(rangeKey, data) {
   for (const gb of s.gapBucketsSummary) {
     const costStr = '$' + Math.round(gb.cost);
     let fixText;
-    if (gb.label === '5-60m') {
-      fixText = `<div class="gap-fix gap-fix-warn">1-hour TTL would prevent these, but its 60% write premium on <em>every</em> cache write costs more than the savings. Best fix: <code>/compact</code> before stepping away, or start a new session when you return.</div>`;
+    if (gb.label === '1-4h') {
+      fixText = `<div class="gap-fix gap-fix-warn">Already past the 1-hour cache window &mdash; no TTL setting fixes this. Run <code>/compact</code> before a break this long, or expect the rebuild cost.</div>`;
     } else {
-      fixText = `<div class="gap-fix gap-fix-warn">Extended cache TTL (<code>"CLAUDE_CODE_USE_EXTENDED_CACHE_TTL": "true"</code>) would cover these gaps. But weigh the 60% write premium against these savings.</div>`;
+      fixText = `<div class="gap-fix gap-fix-warn">Breaks this long always trigger a full rebuild, TTL or not. Use <code>/clear</code> to start a fresh session next time instead of resuming a stale one.</div>`;
     }
-    const rangeLabel = gb.label === '5-60m' ? '5&ndash;60 min' : '&gt; 1 hour';
+    const rangeLabel = gb.label === '1-4h' ? '1&ndash;4 hours' : '&gt; 4 hours';
     gapBucketsHtml += `
             <div class="gap-bucket">
               <div class="gap-count">${gb.count}</div>
@@ -487,7 +487,7 @@ function generateRangePanel(rangeKey, data) {
           <strong>${s.missMultiplier}&times;</strong> normal turn cost
         </div>
         <p class="card-text">
-          When you step away for 5+ minutes during a session, the prompt cache expires.
+          When you step away for more than an hour during a session, the prompt cache expires.
           Coming back means rebuilding it from scratch &mdash; and the bigger the session,
           the more expensive the reload.
         </p>` : `
@@ -915,8 +915,8 @@ function generateHtml(rangeData) {
     display: inline-block; padding: 2px 8px;
     border-radius: 12px; font-size: 12px; font-weight: 600;
   }
-  .gap-tag-5m { background: rgba(210, 153, 34, 0.15); color: #d29922; }
-  .gap-tag-1h { background: rgba(248, 81, 73, 0.15); color: #f85149; }
+  .gap-tag-mid { background: rgba(210, 153, 34, 0.15); color: #d29922; }
+  .gap-tag-long { background: rgba(248, 81, 73, 0.15); color: #f85149; }
   .gap-rebuild-cost { font-weight: 600; color: #f85149; white-space: nowrap; }
   .gap-tokens { font-family: 'SF Mono', SFMono-Regular, monospace; font-size: 13px; color: #8b949e; white-space: nowrap; }
   .gap-bar-cell { width: 30%; min-width: 80px; }
@@ -979,19 +979,18 @@ ${rangePanels}
     <summary>How does this work?</summary>
     <div class="explainer">
       <p><strong>Prompt caching:</strong> Claude Code saves your conversation in a cache so it doesn&rsquo;t
-      have to re-read everything on every turn. By default, this cache expires after <strong>5 minutes</strong>
-      of inactivity. You can extend it to <strong>1 hour</strong> by adding
-      <code>"CLAUDE_CODE_USE_EXTENDED_CACHE_TTL": "true"</code> to your Claude Code settings.</p>
-      <p><strong>Cache expiry:</strong> When the cache expires (you were idle too long), Claude has to
-      rebuild it from scratch. This is expensive &mdash; writing to cache costs
-      12.5&times; more than reading from it. This is the main source of &ldquo;wasted&rdquo; spend.</p>
+      have to re-read everything on every turn. The default cache expires after 5 minutes of inactivity,
+      but this report assumes the <strong>1-hour extended TTL</strong> is enabled
+      (<code>"CLAUDE_CODE_USE_EXTENDED_CACHE_TTL": "true"</code>), so gaps under an hour don&rsquo;t cost you anything.</p>
+      <p><strong>Cache expiry:</strong> When the cache expires (you were idle more than an hour), Claude has to
+      rebuild it from scratch. This is expensive &mdash; the 1-hour TTL write costs
+      20&times; more than reading from cache. This is the main source of &ldquo;wasted&rdquo; spend.</p>
       <p><strong>Why big sessions cost more:</strong> Every turn reads your full conversation.
       A session at 200K tokens reads all 200K per turn. At $0.50/MTok, that&rsquo;s $0.10 just
       in reads &mdash; before Claude even responds.</p>
-      <p><strong>The 5-minute rule:</strong> If you&rsquo;re in a long session and need a break, either
-      extend the cache timeout to 1 hour (see above), or type <code>/compact</code> before
-      stepping away to shrink the session. If you&rsquo;ll be gone a while, <code>/clear</code>
-      starts fresh &mdash; cheaper than Claude reloading a huge conversation.</p>
+      <p><strong>The 1-hour rule:</strong> Breaks under an hour are free &mdash; the cache just sits there.
+      For longer breaks, type <code>/compact</code> before stepping away to shrink the session, or
+      <code>/clear</code> to start fresh &mdash; cheaper than Claude reloading a huge conversation.</p>
     </div>
   </details>
 
@@ -1100,10 +1099,10 @@ function renderIdleGaps(el, gaps) {
   h += '<table class="idle-gaps-table"><thead><tr><th>Date</th><th>Time</th><th>Idle</th><th>Type</th><th>Rebuild Cost</th><th>Tokens</th><th></th></tr></thead><tbody>';
   gaps.forEach(function(g) {
     var dur = g.gap_min >= 60 ? (g.gap_min / 60).toFixed(1) + 'h' : Math.round(g.gap_min) + 'm';
-    var cls = g.bucket === '>1h' ? 'gap-tag-1h' : 'gap-tag-5m';
-    var label = g.bucket === '>1h' ? '>1 hour' : '5\\u201360 min';
+    var cls = g.bucket === '>4h' ? 'gap-tag-long' : 'gap-tag-mid';
+    var label = g.bucket === '>4h' ? '>4 hours' : '1\\u20134 hours';
     var pct = maxCost > 0 ? (g.cost / maxCost * 100) : 0;
-    var barColor = g.bucket === '>1h' ? '#f85149' : '#d29922';
+    var barColor = g.bucket === '>4h' ? '#f85149' : '#d29922';
     h += '<tr><td>' + g.date + '</td><td class="gap-time">' + g.time + '</td>' +
       '<td class="gap-dur">' + dur + '</td>' +
       '<td><span class="gap-tag ' + cls + '">' + label + '</span></td>' +
