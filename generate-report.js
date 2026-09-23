@@ -101,7 +101,7 @@ function parseAllSessions() {
       try {
         const turns = parseSessionFile(filePath);
         if (turns.length > 0) {
-          sessions.push({ id: sessionId, turns });
+          sessions.push({ id: sessionId, project: projDir.replace(/^-Users-[^-]+-/, ''), turns });
         }
       } catch (e) {
         // Skip files that can't be parsed
@@ -233,6 +233,7 @@ function computeRange(sessions, cutoffDate) {
       missSessions.push({
         id: sess.id.substring(0, 15),
         date: fmtDateShort(firstTurnDate),
+        project: sess.project,
         total_cost: Math.round(sessTotalCost * 100) / 100,
         miss_count: sessMissCount,
         miss_cost: Math.round(sessMissCost * 100) / 100,
@@ -245,17 +246,21 @@ function computeRange(sessions, cutoffDate) {
   // ── cost_curves (top 15) ──
   const sessionCosts = filtered.map(sess => {
     let total = 0;
+    let peak = 0;
     const cumulative = [];
     for (const t of sess.turns) {
       total += turnCost(t);
+      peak = Math.max(peak, t.fresh + t.cacheRead + t.cacheWrite);
       cumulative.push(Math.round(total * 10000) / 10000);
     }
     const firstTurnDate = new Date(sess.turns[0].ts);
     return {
       id: sess.id.substring(0, 15),
       date: fmtDateShort(firstTurnDate),
+      project: sess.project,
       total: Math.round(total * 100) / 100,
       turns: sess.turns.length,
+      peak_context_k: Math.round(peak / 1000),
       cumulative,
     };
   });
@@ -270,6 +275,8 @@ function computeRange(sessions, cutoffDate) {
       const d = new Date(t.ts);
       const bucket = t.gapSec >= 4 * 3600 ? '>4h' : '1-4h';
       idleGaps.push({
+        session: sess.id.substring(0, 15),
+        project: sess.project,
         date: fmtDateShort(d),
         time: `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`,
         gap_min: Math.round(t.gapSec / 60 * 10) / 10,
@@ -380,6 +387,158 @@ function computeRange(sessions, cutoffDate) {
       totalGapCost: Math.round(idleGaps.reduce((s, g) => s + g.cost, 0)),
     },
   };
+}
+
+// ── Recommendations ──────────────────────────────────────────────────────
+function money(n) {
+  return n < 0.01 ? '$' + n.toFixed(3) : '$' + n.toFixed(2);
+}
+
+function ruleRecs(s) {
+  const recs = [];
+  const big = s.sizeBuckets[s.sizeBuckets.length - 1];
+  const small = s.sizeBuckets[0];
+  if (s.sizeMultiplier >= 2 && big.sessionCount > 0) {
+    recs.push({
+      cost: big.totalCost,
+      title: `Your biggest sessions cost ${s.sizeMultiplier}× more per turn`,
+      detail: `${big.sessionCount} session${big.sessionCount === 1 ? '' : 's'} went past 200K tokens, running ${money(big.costPerTurn)}/turn vs ${money(small.costPerTurn)} in small ones. Run \`/clear\` or start a new session when you switch tasks, and use \`/compact\` when a long task has to keep going.`,
+    });
+  }
+  if (s.missCostPct >= 10 && s.totalMissTurnCount > 0) {
+    recs.push({
+      cost: s.totalMissCost,
+      title: `Cache misses are ${Math.round(s.missCostPct)}% of your spend`,
+      detail: `${s.totalMissTurnCount} turns had to rebuild the cache from scratch, costing $${s.totalMissCost} — about ${s.missMultiplier}× a normal turn. Finish or \`/clear\` a big session before stepping away rather than coming back to it cold.`,
+    });
+  }
+  if (s.totalGapCount >= 3 && s.totalGapCost >= 5) {
+    recs.push({
+      cost: s.totalGapCost,
+      title: `Coming back after long breaks cost you $${s.totalGapCost}`,
+      detail: `You resumed a session after an hour or more away ${s.totalGapCount} times. After a break, start a fresh session with a short summary of where you were instead of reloading the whole old conversation.`,
+    });
+  }
+  return recs.sort((a, b) => b.cost - a.cost).slice(0, 3).map(({ title, detail }) => ({ title, detail }));
+}
+
+function checkpoints(cumulative, n = 20) {
+  if (cumulative.length <= n) return cumulative.map((c, i) => ({ turn: i + 1, cost: Math.round(c * 100) / 100 }));
+  const pts = [];
+  for (let k = 1; k <= n; k++) {
+    const i = Math.round(k / n * cumulative.length) - 1;
+    pts.push({ turn: i + 1, cost: Math.round(cumulative[i] * 100) / 100 });
+  }
+  return pts;
+}
+
+function reportForClaude(label, data) {
+  const s = data._summary;
+  return {
+    range: label,
+    headline: {
+      totalSpendUSD: s.totalSpend, sessions: s.sessionCount, avgSpendPerActiveDay: s.avgPerDay,
+    },
+    cacheMisses: {
+      turns: s.totalMissTurnCount, pctOfTurns: Math.round(s.missTurnPct * 10) / 10,
+      pctOfSpend: Math.round(s.missCostPct * 10) / 10, costUSD: s.totalMissCost,
+      missTurnVsNormalTurnMultiplier: s.missMultiplier,
+      bySession: data.miss_sessions,
+    },
+    idleGaps: {
+      count: s.totalGapCount, costUSD: s.totalGapCost,
+      buckets: s.gapBucketsSummary.map(g => ({ bucket: g.label, count: g.count, costUSD: Math.round(g.cost) })),
+      each: data.idle_gaps,
+    },
+    sessionSize: {
+      largestVsSmallestCostPerTurn: s.sizeMultiplier,
+      buckets: s.sizeBuckets.map(b => ({
+        peakContext: b.label, sessions: b.sessionCount, turns: b.totalTurns,
+        costPerTurnUSD: Math.round(b.costPerTurn * 1000) / 1000, totalCostUSD: Math.round(b.totalCost),
+      })),
+    },
+    costliestSessions: data.cost_curves.map(c => ({
+      id: c.id, project: c.project, started: c.date, turns: c.turns, totalUSD: c.total,
+      peakContextK: c.peak_context_k, cumulativeCostCheckpoints: checkpoints(c.cumulative),
+    })),
+    dailySpend: data.daily,
+  };
+}
+
+function askClaude(prompt) {
+  const { spawn } = require('child_process');
+  const env = { ...process.env };
+  delete env.CLAUDECODE;
+  return new Promise((resolve, reject) => {
+    const child = spawn('claude', ['-p', '--model', 'opus', '--no-session-persistence', '--tools', ''], {
+      env, stdio: ['pipe', 'pipe', 'ignore'],
+    });
+    let out = '';
+    const timer = setTimeout(() => { child.kill(); reject(new Error('timed out')); }, 240000);
+    child.stdout.on('data', d => { out += d; });
+    child.on('error', e => { clearTimeout(timer); reject(e); });
+    child.on('close', code => {
+      clearTimeout(timer);
+      code === 0 ? resolve(out) : reject(new Error(`claude exited with code ${code}`));
+    });
+    child.stdin.end(prompt);
+  });
+}
+
+async function claudeRecsForRange(label, data) {
+  const prompt = `You're a sharp analyst reviewing one person's Claude Code usage report. You'll write the "Recommendation" card at the bottom of it. The reader is a teammate (often a designer, not a developer) who wants to know whether to change anything about how they work to spend less — and wants to be able to trust the advice.
+
+How costs work: Claude Code runs Opus with a 1-hour prompt cache. Every turn re-reads the entire conversation, so per-turn cost grows with context size. Reading cached context is cheap ($0.50/MTok); after an hour idle the cache expires and rebuilding it costs 20x more ($10/MTok). Levers: /clear or a new session when switching tasks, /compact to shrink a long session, not resuming a huge session after a long break.
+
+Here is the full report for "${label}" as JSON. It contains: headline totals; cache misses (with the sessions that had them); every idle gap over an hour (with its session and project); spend by peak session size; the 15 costliest sessions with project name and a cumulative cost curve (cost so far at checkpoints through the session); and daily spend.
+
+${JSON.stringify(reportForClaude(label, data))}
+
+First, analyze. Look for what actually drives this person's spend: which specific sessions and projects, whether cost per turn climbs steeply late in long sessions (compare the slope of the cumulative curve early vs late), whether idle gaps land inside expensive sessions, whether a few days or sessions dominate. Estimate roughly what a specific change would have saved, in dollars, using the numbers given (e.g. if the last half of a session cost far more per turn than the first half, a fresh start midway would have saved about the difference). Be skeptical: big sessions are sometimes the right call, and small dollar amounts aren't worth changing habits for. Don't recommend anything under ~$20 of estimated savings.
+
+Then write your findings: 2-4 short bullets that tell the reader what their numbers actually mean — the verdict on each thing that matters (e.g. whether big sessions really cost more per turn, what breaks cost them, what actually drives their spend). One plain sentence each, with real numbers, bold the key phrase with **double asterisks**. These show even when there's nothing to change, so they should answer "am I doing OK, and why?".
+
+Then write 0-3 recommendations, biggest savings first. Each needs:
+- "title": under 12 words, plain language, leads with the concrete finding.
+- "detail": 2-3 plain sentences. Name the specific session(s) by project and date, say what happened, what to do differently next time, and the rough dollar savings. Wrap commands in backticks. No jargon (no "context window", "tokens", "cache write" — say "conversation history", "reloading", etc.).
+If nothing is worth changing, return an empty list — that's a fine answer.
+
+After your analysis, end your reply with a line containing only RESULT: followed on the next line by a JSON object like {"findings":["..."],"recs":[{"title":"...","detail":"..."}]}`;
+
+  const out = await askClaude(prompt);
+  const marker = out.lastIndexOf('RESULT:');
+  if (marker < 0) throw new Error('no RESULT in reply');
+  const body = out.slice(marker + 7);
+  const json = JSON.parse(body.slice(body.indexOf('{'), body.lastIndexOf('}') + 1));
+  if (!Array.isArray(json.findings) || !Array.isArray(json.recs)) throw new Error('reply was missing findings or recs');
+  return {
+    findings: json.findings.filter(f => typeof f === 'string').slice(0, 4),
+    recs: json.recs.filter(x => x && typeof x.title === 'string' && typeof x.detail === 'string').slice(0, 3),
+  };
+}
+
+async function attachRecommendations(rangeData) {
+  const useClaude = !process.argv.includes('--no-claude');
+  if (useClaude) console.log('Asking Claude to read your report and write recommendations (takes a minute or two, skip with --no-claude)...');
+  await Promise.all(RANGES.map(async r => {
+    const data = rangeData[r.key];
+    if (useClaude) {
+      try {
+        ({ findings: data.findings, recs: data.recs } = await claudeRecsForRange(r.label, data));
+        data.recsByClaude = true;
+        return;
+      } catch (e) {
+        console.log(`  ${r.label}: couldn't get recommendations from Claude (${e.code === 'ENOENT' ? 'claude not found' : e.message.split('\n')[0]}), using built-in rules instead.`);
+      }
+    }
+    data.findings = [];
+    data.recs = ruleRecs(data._summary);
+    data.recsByClaude = false;
+  }));
+}
+
+function recText(s) {
+  return escHtml(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
 
 // ── HTML generation ──────────────────────────────────────────────────────
@@ -541,14 +700,21 @@ function generateRangePanel(rangeKey, data) {
     </div>
 
     <div class="card rec">
-      <div class="card-label">Recommendation</div>
-
+      <div class="card-label">What Claude found</div>
+      ${data.findings.length > 0 ? `
+        <ul class="findings">${data.findings.map(f => `<li>${recText(f)}</li>`).join('')}</ul>` : ''}
+      ${data.recs.length > 0 ? `
+        ${data.findings.length > 0 ? '<div class="rec-heading">What to change</div>' : ''}
+        ${data.recs.map(r => `
+        <div class="rec-item">
+          <div class="rec-title">${recText(r.title)}</div>
+          <p class="rec-detail">${recText(r.detail)}</p>
+        </div>`).join('')}` : `
         <div class="good">
           <div class="good-icon">&check;</div>
-          <div class="good-text">
-            Your settings match your usage patterns. No changes needed &mdash; keep doing what you&rsquo;re doing.
-          </div>
-        </div>
+          <div class="good-text">No changes worth making in this period.</div>
+        </div>`}
+      ${data.recsByClaude ? '<div class="rec-source">Written by Claude after reading this report</div>' : ''}
     </div>
 
   </div>`;
@@ -759,6 +925,20 @@ function generateHtml(rangeData) {
   }
   .rec-detail {
     font-size: 14px; color: #9ca3af; line-height: 1.7; margin: 0 0 20px;
+  }
+  .rec-item + .rec-item { border-top: 1px solid #30363d; padding-top: 20px; }
+  .rec-item .rec-title { font-size: 17px; margin: 0 0 6px; }
+  .rec-item .rec-detail { margin: 0 0 20px; }
+  .rec-detail code {
+    color: #79c0ff; background: #0d1117; padding: 1px 6px; border-radius: 4px; font-size: 13px;
+  }
+  .rec-source { font-size: 12px; color: #9ca3af; }
+  .findings { margin: 0 0 24px; padding-left: 20px; }
+  .findings li { font-size: 15px; color: #c9d1d9; line-height: 1.7; margin-bottom: 8px; }
+  .findings strong { color: #f0f6fc; }
+  .rec-heading {
+    font-size: 12px; font-weight: 700; color: #9ca3af; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 12px;
   }
   .setting-block {
     background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
@@ -1237,7 +1417,7 @@ document.querySelector('.range-panel[data-range="30d"]').classList.add('active')
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────
-function main() {
+async function main() {
   console.log('Parsing session logs from', PROJECTS_DIR, '...');
   const sessions = parseAllSessions();
   console.log(`Found ${sessions.length} sessions`);
@@ -1253,6 +1433,7 @@ function main() {
     const cutoff = r.days ? new Date(now.getTime() - r.days * 24 * 60 * 60 * 1000) : null;
     rangeData[r.key] = computeRange(sessions, cutoff);
   }
+  await attachRecommendations(rangeData);
 
   let minDate = Infinity, maxDate = -Infinity;
   for (const sess of sessions) {
@@ -1279,4 +1460,4 @@ function main() {
   require('child_process').exec(`${opener} "${OUTPUT_FILE}"`);
 }
 
-main();
+main().catch(e => { console.error(e); process.exit(1); });
