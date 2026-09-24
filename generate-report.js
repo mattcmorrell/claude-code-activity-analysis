@@ -99,9 +99,9 @@ function parseAllSessions() {
       const filePath = path.join(projPath, entry.name);
 
       try {
-        const turns = parseSessionFile(filePath);
+        const { turns, compactions } = parseSessionFile(filePath);
         if (turns.length > 0) {
-          sessions.push({ id: sessionId, project: projDir.replace(/^-Users-[^-]+-/, ''), turns });
+          sessions.push({ id: sessionId, project: projDir.replace(/^-Users-[^-]+-/, ''), turns, compactions });
         }
       } catch (e) {
         // Skip files that can't be parsed
@@ -116,17 +116,32 @@ function parseSessionFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const lines = content.split('\n').filter(l => l.trim());
   const turns = [];
+  const compactions = [];
+  const turnById = new Map();
   let prevTs = null;
 
   for (const line of lines) {
     let d;
     try { d = JSON.parse(line); } catch { continue; }
 
+    if (d.subtype === 'compact_boundary') {
+      const cts = new Date(d.timestamp).getTime();
+      if (!isNaN(cts)) compactions.push(cts);
+      continue;
+    }
     if (d.type !== 'assistant') continue;
     const u = d.message?.usage;
     if (!u) continue;
     const ts = d.timestamp;
     if (!ts) continue;
+
+    // One reply with several content blocks is logged as several lines that repeat the same usage
+    const mid = d.message.id;
+    if (mid && turnById.has(mid)) {
+      const prev = turnById.get(mid);
+      prev.output = Math.max(prev.output, u.output_tokens || 0);
+      continue;
+    }
 
     const tsMs = new Date(ts).getTime();
     if (isNaN(tsMs)) continue;
@@ -139,7 +154,7 @@ function parseSessionFile(filePath) {
     const gapSec = prevTs ? (tsMs - prevTs) / 1000 : 0;
     prevTs = tsMs;
 
-    turns.push({
+    const turn = {
       ts: tsMs,
       date: ts,
       fresh,
@@ -147,10 +162,12 @@ function parseSessionFile(filePath) {
       cacheWrite,
       output,
       gapSec,
-    });
+    };
+    turns.push(turn);
+    if (mid) turnById.set(mid, turn);
   }
 
-  return turns;
+  return { turns, compactions };
 }
 
 // ── Compute metrics for a time range ─────────────────────────────────────
@@ -290,33 +307,28 @@ function computeRange(sessions, cutoffDate) {
 
   // ── Session size buckets ──
   const sizeBuckets = [
-    { label: '< 100K', min: 0, max: 100000, totalCost: 0, totalTurns: 0, sessionCount: 0 },
-    { label: '100-200K', min: 100000, max: 200000, totalCost: 0, totalTurns: 0, sessionCount: 0 },
-    { label: '> 200K', min: 200000, max: Infinity, totalCost: 0, totalTurns: 0, sessionCount: 0 },
+    { label: '< 100K', min: 0, max: 100000, totalCost: 0, totalTurns: 0 },
+    { label: '100-200K', min: 100000, max: 200000, totalCost: 0, totalTurns: 0 },
+    { label: '> 200K', min: 200000, max: Infinity, totalCost: 0, totalTurns: 0 },
   ];
 
+  let compactionCount = 0;
   for (const sess of filtered) {
-    let maxContext = 0;
-    let sessTotalCost = 0;
+    compactionCount += cutoffDate ? sess.compactions.filter(c => c >= cutoffDate.getTime()).length : sess.compactions.length;
     for (const t of sess.turns) {
       const ctx = t.cacheRead + t.cacheWrite + t.fresh;
-      if (ctx > maxContext) maxContext = ctx;
-      sessTotalCost += turnCost(t);
-    }
-    for (const b of sizeBuckets) {
-      if (maxContext >= b.min && maxContext < b.max) {
-        b.totalCost += sessTotalCost;
-        b.totalTurns += sess.turns.length;
-        b.sessionCount++;
-        break;
-      }
+      const b = sizeBuckets.find(b => ctx >= b.min && ctx < b.max);
+      b.totalCost += turnCost(t);
+      b.totalTurns++;
     }
   }
 
   // Compute cost/turn per bucket
+  const allTurns = sizeBuckets.reduce((n, b) => n + b.totalTurns, 0);
   const bucketCostPerTurn = sizeBuckets.map(b => ({
     ...b,
     costPerTurn: b.totalTurns > 0 ? b.totalCost / b.totalTurns : 0,
+    turnPct: allTurns > 0 ? b.totalTurns / allTurns * 100 : 0,
   }));
   const activeBuckets = bucketCostPerTurn.filter(b => b.totalTurns > 0);
   const maxCostPerTurn = activeBuckets.length > 0 ? Math.max(...activeBuckets.map(b => b.costPerTurn)) : 0;
@@ -382,6 +394,7 @@ function computeRange(sessions, cutoffDate) {
       sizeMultiplier: Math.round(sizeMultiplier * 10) / 10,
       sizeBuckets: bucketCostPerTurn,
       maxCostPerTurn,
+      compactionCount,
       gapBucketsSummary,
       totalGapCount: idleGaps.length,
       totalGapCost: Math.round(idleGaps.reduce((s, g) => s + g.cost, 0)),
@@ -398,11 +411,11 @@ function ruleRecs(s) {
   const recs = [];
   const big = s.sizeBuckets[s.sizeBuckets.length - 1];
   const small = s.sizeBuckets[0];
-  if (s.sizeMultiplier >= 2 && big.sessionCount > 0) {
+  if (s.sizeMultiplier >= 2 && big.totalTurns > 0) {
     recs.push({
       cost: big.totalCost,
-      title: `Your biggest sessions cost ${s.sizeMultiplier}× more per turn`,
-      detail: `${big.sessionCount} session${big.sessionCount === 1 ? '' : 's'} went past 200K tokens, running ${money(big.costPerTurn)}/turn vs ${money(small.costPerTurn)} in small ones. Run \`/clear\` or start a new session when you switch tasks, and use \`/compact\` when a long task has to keep going.`,
+      title: `Turns in your biggest conversations cost ${s.sizeMultiplier}× more`,
+      detail: `${Math.round(big.turnPct)}% of your turns ran with over 200K of conversation history, at ${money(big.costPerTurn)}/turn vs ${money(small.costPerTurn)} in small ones. Run \`/clear\` or start a new session when you switch tasks, and use \`/compact\` when a long task has to keep going.`,
     });
   }
   if (s.missCostPct >= 10 && s.totalMissTurnCount > 0) {
@@ -450,10 +463,11 @@ function reportForClaude(label, data) {
       buckets: s.gapBucketsSummary.map(g => ({ bucket: g.label, count: g.count, costUSD: Math.round(g.cost) })),
       each: data.idle_gaps,
     },
-    sessionSize: {
+    conversationSize: {
       largestVsSmallestCostPerTurn: s.sizeMultiplier,
+      compactionsRun: s.compactionCount,
       buckets: s.sizeBuckets.map(b => ({
-        peakContext: b.label, sessions: b.sessionCount, turns: b.totalTurns,
+        conversationSizeAtTurn: b.label, turns: b.totalTurns, pctOfTurns: Math.round(b.turnPct),
         costPerTurnUSD: Math.round(b.costPerTurn * 1000) / 1000, totalCostUSD: Math.round(b.totalCost),
       })),
     },
@@ -490,7 +504,7 @@ async function claudeRecsForRange(label, data) {
 
 How costs work: Claude Code runs Opus with a 1-hour prompt cache. Every turn re-reads the entire conversation, so per-turn cost grows with context size. Reading cached context is cheap ($0.50/MTok); after an hour idle the cache expires and rebuilding it costs 20x more ($10/MTok). Levers: /clear or a new session when switching tasks, /compact to shrink a long session, not resuming a huge session after a long break.
 
-Here is the full report for "${label}" as JSON. It contains: headline totals; cache misses (with the sessions that had them); every idle gap over an hour (with its session and project); spend by peak session size; the 15 costliest sessions with project name and a cumulative cost curve (cost so far at checkpoints through the session); and daily spend.
+Here is the full report for "${label}" as JSON. It contains: headline totals; cache misses (with the sessions that had them); every idle gap over an hour (with its session and project); spend grouped by how big the conversation was at the moment of each turn, plus how many times they ran /compact (which shrinks a conversation mid-session); the 15 costliest sessions with project name and a cumulative cost curve (cost so far at checkpoints through the session); and daily spend.
 
 ${JSON.stringify(reportForClaude(label, data))}
 
@@ -573,7 +587,7 @@ function generateRangePanel(rangeKey, data) {
     const b = s.sizeBuckets[i];
     const pct = s.maxCostPerTurn > 0 ? Math.round(b.costPerTurn / s.maxCostPerTurn * 100) : 0;
     const costPerTurnStr = b.costPerTurn < 0.01 ? '$' + b.costPerTurn.toFixed(3) + '/turn' : '$' + b.costPerTurn.toFixed(2) + '/turn';
-    const countStr = b.sessionCount === 1 ? '1 session' : b.sessionCount + ' sessions';
+    const countStr = `${Math.round(b.turnPct)}% of turns`;
     sizeBarsHtml += `
         <div class="size-row">
           <span class="size-label">${sizeLabels[i]}</span>
@@ -675,20 +689,20 @@ function generateRangePanel(rangeKey, data) {
     <div class="chart-drawer" data-chart="idle-gaps"></div>
 
     <div class="card size">
-      <div class="card-label">Session Size Impact</div>
+      <div class="card-label">Conversation Size Impact</div>
       ${s.sizeMultiplier > 1 ? `
         <div class="hero-single">
           <span class="hero-num">${s.sizeMultiplier}&times;</span>
-          <span class="hero-desc">more expensive per turn in your largest sessions</span>
+          <span class="hero-desc">more expensive per turn when a conversation is at its biggest</span>
         </div>` : `
         <div class="hero-single">
           <span class="hero-num">1&times;</span>
-          <span class="hero-desc">sessions are similarly sized</span>
+          <span class="hero-desc">cost per turn stays flat as conversations grow</span>
         </div>`}
     <div class="size-bars">${sizeBarsHtml}</div>
     <p class="card-text">
-      Every turn re-reads your full conversation context. Bigger context = higher per-turn cost.
-      Use <code>/clear</code> at natural breakpoints to keep sessions lean.
+      Every turn re-reads the whole conversation so far, so each turn costs more as it grows.
+      ${s.compactionCount > 0 ? `You ran <code>/compact</code> ${s.compactionCount} time${s.compactionCount === 1 ? '' : 's'} this period, which shrinks a conversation so it can keep going.` : `Use <code>/compact</code> to shrink a long conversation, or <code>/clear</code> when you switch tasks.`}
     </p>
       <a class="drill-link" href="#" data-chart="cost-curves" data-label-closed="See cost curves &#8594;" data-label-open="Hide cost curves">See cost curves &#8594;</a>
     </div>
